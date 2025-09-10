@@ -1,0 +1,61 @@
+harvesttenderroots/
+├── admin/                     # Admin panel (backend)
+│   ├── controllers/           # Admin controllers (CRUD logic)
+│   │   ├── aboutController.js
+│   │   ├── courseController.js
+│   │   ├── studentLifeController.js
+│   │   └── authController.js
+│   ├── routes/                # Admin routes
+│   │   ├── adminRoutes.js
+│   │   ├── adminAboutRoutes.js
+│   │   ├── adminCourseRoutes.js
+│   │   └── adminStudentLifeRoutes.js
+│   ├── views/                 # EJS templates for admin panel
+│   │   ├── login.ejs
+│   │   ├── dashboard.ejs
+│   │   ├── about-form.ejs
+│   │   └── course-form.ejs
+│   └── public/                # Admin static assets (CSS, JS, images)
+│       ├── css/
+│       ├── js/
+│       └── images/
+│
+├── config/
+│   └── db.js                  # MySQL connection configuration
+│
+├── routes/                    # Frontend routes
+│   ├── indexRoutes.js         # Home, contact, about
+│   ├── aboutRoutes.js
+│   ├── courseRoutes.js
+│   ├── galleryRoutes.js
+│   ├── studentLifeRoutes.js
+│   └── websiteContact.js      # Contact form submissions
+│
+├── controllers/               # Frontend controllers
+│   ├── homeController.js
+│   ├── aboutController.js
+│   ├── courseController.js
+│   └── contactController.js
+│
+├── views/                     # Frontend EJS templates
+│   ├── partials/              # header, footer, navbars
+│   │   ├── header.ejs
+│   │   └── footer.ejs
+│   ├── index.ejs
+│   ├── about.ejs
+│   ├── courses.ejs
+│   ├── gallery.ejs
+│   └── student-life.ejs
+│
+├── public/                    # Frontend static assets
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   └── fonts/
+│
+├── uploads/                   # File uploads (images, documents)
+│
+├── .env                       # Environment variables (DB credentials, session secret)
+├── app.js                     # Main Express application
+├── package.json
+└── package-lock.json
