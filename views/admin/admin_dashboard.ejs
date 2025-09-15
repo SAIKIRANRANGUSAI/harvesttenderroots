@@ -1,0 +1,30 @@
+<%-
+  include('layouts/admin_layouts', {
+    title: 'Admin Dashboard | VidyaVedika',
+    currentPage: 'dashboard',
+    body: `
+      <div class="content">
+          <div class="page-header">
+              <h1 class="page-title">Dashboard</h1>
+              <div class="breadcrumb">
+                  <a href="/admin/dashboard">Home</a>
+                  <i class="fas fa-chevron-right"></i>
+                  <span>Dashboard</span>
+              </div>
+          </div>
+
+          <!-- Your testing content -->
+          <h1>Hello, Welcome to the Dashboard!</h1>
+          
+          <!-- You can add more content here as needed -->
+          <div class="content-section">
+              <div class="section-header">
+                  <h2 class="section-title">Welcome to Admin Panel</h2>
+              </div>
+              <p>This is the main content area where you can add your specific page content.</p>
+              <p>You can use the sidebar to navigate to different sections of the admin panel.</p>
+          </div>
+      </div>
+    `
+  })
+%>
