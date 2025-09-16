@@ -52,7 +52,11 @@ router.get("/home", isAuthenticated, async (req, res) => {
     const values = rowss;
     const [siteRows] = await db.query("SELECT * FROM site_content LIMIT 1");
     const content = siteRows[0] || {};
-    res.render("admin/admin_home", { homeContent, values, content });
+    const [whyRows]  = await db.query("SELECT * FROM why_choose_us WHERE id = 1");
+    const why     = whyRows[0] || {};
+    const [rowsf] = await db.query("SELECT * FROM fun_classes WHERE id = 1");
+    const fun = rowsf[0] || {};
+    res.render("admin/admin_home", { homeContent, values, content, why, fun });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
@@ -318,5 +322,225 @@ router.post("/site-content/update", isAuthenticated, upload.fields([
     res.status(500).send("Server error");
   }
 });
+
+// =======================
+// WHY CHOOSE US (with Cloudinary)
+// =======================
+router.post("/why-choose-us/update", upload.single("image"), isAuthenticated, async (req, res) => {
+  try {
+    const body = req.body;
+    let image = null;
+
+    // Upload new image if provided
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "harvesttenderroots/why-choose-us"
+      });
+      image = result.secure_url;
+      fs.unlinkSync(req.file.path); // remove local temp file
+    }
+
+    const [rows] = await db.query("SELECT * FROM why_choose_us WHERE id = 1");
+    const content = rows[0] || {};
+
+    if (!content.id) {
+      // Insert
+      await db.query(
+        `INSERT INTO why_choose_us 
+        (main_heading, main_description, celebration_link,
+         values_heading, values_description,
+         mission_heading, mission_description,
+         vision_heading, vision_description, image)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          body.main_heading,
+          body.main_description,
+          body.celebration_link,
+          body.values_heading,
+          body.values_description,
+          body.mission_heading,
+          body.mission_description,
+          body.vision_heading,
+          body.vision_description,
+          image
+        ]
+      );
+    } else {
+      // Update
+      await db.query(
+        `UPDATE why_choose_us SET
+          main_heading = ?, 
+          main_description = ?, 
+          celebration_link = ?,
+          values_heading = ?, 
+          values_description = ?,
+          mission_heading = ?, 
+          mission_description = ?,
+          vision_heading = ?, 
+          vision_description = ?,
+          image = COALESCE(?, image)
+         WHERE id = 1`,
+        [
+          body.main_heading,
+          body.main_description,
+          body.celebration_link,
+          body.values_heading,
+          body.values_description,
+          body.mission_heading,
+          body.mission_description,
+          body.vision_heading,
+          body.vision_description,
+          image
+        ]
+      );
+    }
+
+    res.redirect("/admin/home");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+
+// =======================
+// FUN CLASSES (with Cloudinary)
+// =======================
+router.post("/fun-classes/update", upload.single("image"), isAuthenticated, async (req, res) => {
+  try {
+    const body = req.body;
+    let image = null;
+
+    // Upload new image if provided
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "harvesttenderroots/fun-classes"
+      });
+      image = result.secure_url;
+      fs.unlinkSync(req.file.path); // remove local temp file
+    }
+
+    const [rows] = await db.query("SELECT * FROM fun_classes WHERE id = 1");
+    const fun = rows[0] || {};
+
+    if (!fun.id) {
+      // Insert
+      await db.query(
+        `INSERT INTO fun_classes (heading, description, youtube_link, image)
+         VALUES (?, ?, ?, ?)`,
+        [body.heading, body.description, body.youtube_link, image]
+      );
+    } else {
+      // Update
+      await db.query(
+        `UPDATE fun_classes SET 
+           heading = ?, 
+           description = ?, 
+           youtube_link = ?, 
+           image = COALESCE(?, image)
+         WHERE id = 1`,
+        [body.heading, body.description, body.youtube_link, image]
+      );
+    }
+
+    res.redirect("/admin/home");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+// Show all about us info
+router.get("/about-us", async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM school_info ORDER BY id ASC");
+    res.render("admin/admin_about-us", {
+      infoList: rows,
+      formMode: false,
+      info: null,
+    });
+  } catch (err) {
+    console.error("Error fetching about us info:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// Show Add Form
+router.get("/about-us/add", async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM school_info ORDER BY id ASC");
+    res.render("admin/admin_about-us", {
+      infoList: rows,
+      formMode: true,
+      info: null,
+    });
+  } catch (err) {
+    console.error("Error loading add form:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// Handle Add
+router.post("/about-us/add", async (req, res) => {
+  try {
+    const { field_name, field_value } = req.body;
+    await db.query(
+      "INSERT INTO school_info (field_name, field_value) VALUES (?, ?)",
+      [field_name, field_value]
+    );
+    res.redirect("/admin/about-us");
+  } catch (err) {
+    console.error("Error adding about us info:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// Show Edit Form
+router.get("/about-us/edit/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const [rows] = await db.query("SELECT * FROM school_info ORDER BY id ASC");
+    const [record] = await db.query("SELECT * FROM school_info WHERE id = ?", [
+      id,
+    ]);
+    res.render("admin/admin_about-us", {
+      infoList: rows,
+      formMode: true,
+      info: record[0] || null,
+    });
+  } catch (err) {
+    console.error("Error loading edit form:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// Handle Edit
+router.post("/about-us/edit/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { field_name, field_value } = req.body;
+    await db.query(
+      "UPDATE school_info SET field_name = ?, field_value = ? WHERE id = ?",
+      [field_name, field_value, id]
+    );
+    res.redirect("/admin/about-us");
+  } catch (err) {
+    console.error("Error updating about us info:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// Delete
+router.get("/about-us/delete/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await db.query("DELETE FROM school_info WHERE id = ?", [id]);
+    res.redirect("/admin/about-us");
+  } catch (err) {
+    console.error("Error deleting about us info:", err);
+    res.status(500).send("Server error");
+  }
+});
+
 
 module.exports = router;

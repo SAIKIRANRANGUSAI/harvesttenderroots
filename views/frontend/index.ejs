@@ -4,58 +4,49 @@
     <!-- hero-area-start -->
     <div class="it-hero-2-area it-hero-2-bg fix p-relative" data-background="/images/hero-bg-1.jpg">
       <div class="it-hero-2-shape-4">
-        <img src="/images/shape-2-7.png" alt="" />
+        <img src="<%= homeContent.background_image || " Default Heading" %>" alt="" />
       </div>
 
       <div class="it-hero-2-funfact text-center d-none d-xl-block">
         <span class="theme"><i class="purecounter" data-purecounter-duration="1"
             data-purecounter-end="11">0</i>k+</span>
         <span>Total Student</span>
-        <img src="/images/shape-2-8.png" alt="" />
+        <img src="<%= homeContent.funfact_image || " Default Heading" %>" alt="" />
       </div>
       <div class="container">
         <div class="row align-items-center">
           <div class="col-xl-6 col-lg-6">
             <div class="it-hero-2-content">
-              <h1 class="it-hero-2-title">
-                Harvest
-                <span class="p-relative"> School </span>
-                Nurturing Young Minds <br />Building Bright Futures
-              </h1>
-              <div class="it-hero-2-text">
-                <p>
-                  At Harvest, we create a safe and inspiring space where every
-                  child begins a journey of curiosity and growth. Our balanced
-                  curriculum blends academics with real-world skills through
-                  engaging, activity-based learning. We empower students with
-                  independence, critical thinking, and wisdom to face
-                  tomorrow’s challenges with confidence.
-                </p>
-                <div class="it-hero-2-btn-box d-flex align-items-center">
-                  <a class="it-btn" href="gallery">
-                    <span>
-                      Activities
-                      <svg width="17" height="14" viewBox="0 0 17 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11 1.24023L16 7.24023L11 13.2402" stroke="currentcolor" stroke-width="1.5"
-                          stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M1 7.24023H16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </span>
-                  </a>
-                  <div class="it-hero-2-play">
-                    <a class="popup-video" href="https://www.youtube.com/watch?v=VcY1_UNMZRE"><i
-                        class="fas fa-play"></i></a>
-                    <span>Watch Now</span>
+              <div class="it-hero-2-title">
+                <%- homeContent.main_heading || "Default Heading" %>
+              </div>
+              <div class="it-hero-2-text"> <%- homeContent.main_description || "Default description" %>
+                  <div class="it-hero-2-btn-box d-flex align-items-center">
+                    <a class="it-btn" href="gallery">
+                      <span>
+                        <%= homeContent.sub_heading || "Default Heading" %>
+                          <svg width="17" height="14" viewBox="0 0 17 14" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 1.24023L16 7.24023L11 13.2402" stroke="currentcolor" stroke-width="1.5"
+                              stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M1 7.24023H16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                      </span>
+                    </a>
+                    <div class="it-hero-2-play">
+                      <a class="popup-video" href="<%= homeContent.youtube_link || " Default Heading" %>"><i
+                          class="fas fa-play"></i></a>
+                      <span>Watch Now</span>
+                    </div>
                   </div>
-                </div>
               </div>
             </div>
           </div>
           <div class="col-xl-4 col-lg-4">
             <div class="it-hero-2-thumb-box p-relative">
               <div class="it-hero-2-thumb p-relative">
-                <img src="/images/banner-img.png" class="img-fluid" alt="" />
+                <img src="<%= homeContent.hero_image || " Default Heading" %>" class="img-fluid" alt="" />
                 <!-- <div class="it-hero-2-shape-1 d-none d-xl-block">
                     <img src="/images/hero/shape-2-6.png" alt="" />
                   </div> -->
@@ -164,13 +155,13 @@
           <div class="col-xl-6 col-lg-6">
             <div class="it-about-thumb-box p-relative">
               <div class="it-about-thumb-1 d-none d-xl-block">
-                <img src="/images/thumb-4-1.jpg" alt="" />
+                <img src="<%- content.home3_image %>" alt="" />
               </div>
               <div class="it-about-thumb-2 d-none d-xl-block">
-                <img src="/images/thumb-4-2.jpg" alt="" />
+                <img src="<%- content.home2_image %>" alt="" />
               </div>
               <div class="it-about-main-thumb text-xl-end text-center">
-                <img src="/images/thumb-3.jpg" alt="" />
+                <img src="<%- content.home1_image %>" alt="" />
               </div>
             </div>
           </div>
@@ -178,42 +169,24 @@
             <div class="it-about-right-box">
               <div class="it-about-title-box mb-20">
                 <span class="it-section-subtitle">About Harvest School</span>
-                <h4 class="it-section-title">
-                  Shaping
-                  <span class="p-relative z-index"> Young Minds </span>
-                  <br />
-                  with Care
-                </h4>
+                <div class="it-section-title">
+                  <%- content.main_heading %>
+
+                </div>
               </div>
               <div class="it-about-text pb-10">
-                <p>
-                  We provide a balanced educational programme within a safe
-                  and stimulating environment, so that each child embarks on a
-                  physical, intellectual and social journey of curiosity and
-                  reasoning. Harvest thus offers a comprehensive and a
-                  balanced curriculum which is designed to make learning
-                  enjoyable, activity-based and experimental, preparing every
-                  student for higher challenges. During these important years,
-                  the focus is both on the curriculum as well as the
-                  development of intricate skills like critical thinking,
-                  solving real life issues while developing independence and
-                  wisdom.
-                </p>
+                <%- content.main_description %>
               </div>
               <div class="it-about-content-wrapper d-flex align-items-center justify-content-between pb-15">
                 <div class="it-about-content">
-                  <h5>Flexible Classes</h5>
-                  <p>
-                    At Harvest School, we understand that every child learns
-                    differently. Our flexible classes are designed to adapt to
-                    individual learning styles, ensuring that students grasp
-                    concepts at their own pace. With a mix of interactive
-                    sessions, activity-based learning, and personalized
-                    guidance, we make education both engaging and effective.
-                  </p>
-                </div>
+  <%- content.homeabout_heading %>
+  <%- content.homeabout_description %>
+</div>
+
+
+
               </div>
-              <a class="it-btn" href="about-us.ejs">
+              <a class="it-btn" href="about-us">
                 <span>
                   Read More
                   <svg width="17" height="14" viewBox="0 0 17 14" fill="none" xmlns="http://www.w3.org/2000/svg">

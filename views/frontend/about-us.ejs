@@ -3,7 +3,7 @@
     <main>
 
       <!-- breadcrumb-area-start -->
-      <div class="it-breadcrumb-area it-breadcrumb-bg" style="background-image: url(assets/img/breadcrumb-img.png); background-size: cover; background-position: center center; background-repeat: no-repeat;">
+      <div class="it-breadcrumb-area it-breadcrumb-bg" style="background-image: url(/images/breadcrumb-img.png); background-size: cover; background-position: center center; background-repeat: no-repeat;">
          <div class="container">
             <div class="row ">
                <div class="col-md-12">
@@ -13,7 +13,7 @@
                      </div>
                      <div class="it-breadcrumb-list-wrap">
                         <div class="it-breadcrumb-list">
-                           <span><a href="index.ejs">home</a></span> 
+                           <span><a href="index">home</a></span> 
                            <span class="dvdr">//</span>
                            <span>about us</span>
                         </div>
@@ -32,11 +32,11 @@
                <div class="col-xl-6 col-lg-6">
                   <div class="it-about-4-thumb-wrap d-flex align-items-center justify-content-center justify-content-lg-end">
                      <div class="it-about-4-thumb-double d-flex flex-column">
-                        <img class="mb-20" src="assets/img/about-us3-img.jpg" alt="">
-                        <img src="assets/img/about-us2-img.jpg" alt="">
+                        <img class="mb-20" src="<%- content.about2_image %>" alt="">
+                        <img src="<%- content.about1_image %>" alt="">
                      </div>
                      <div class="it-about-4-thumb-single">
-                        <img src="assets/img/about-us-img.jpg" alt="">
+                        <img src="<%- content.about3_image %>" alt="">
                      </div>
                   </div>
                </div>
@@ -46,30 +46,31 @@
                      
                         about us
                      </span>
-                     <h2 class="it-section-title-3 pb-30">A School with Heart, Vision, and<span> Excellence</span></h2>
-                     <p>We provide a balanced educational programme within a safe and stimulating environment, so that each child embarks on a physical, intellectual and social journey of curiosity and reasoning. Harvest thus offers a comprehensive and a balanced curriculum which is designed to make learning enjoyable, activity-based and experimental, preparing every student for higher challenges. During these important years, the focus is both on the curriculum as well as the development of intricate skills like critical thinking, solving real life issues while developing independence and wisdom.</p>
+                     <div class="it-section-title-3 pb-30"><%- content.about_home_heading || '' %></div>
+
+                     <%- content.about_home_description	 %>
                   </div>
                   <div class="it-about-3-mv-box">
                      <div class="row">
                         <div class="col-xl-12">
                            <div class="it-about-4-list-wrap d-flex align-items-start">
                               <div class="it-about-4-list-icon">
-                                 <span><img src="assets/img/our-mission.png" alt=""></i></span>
+                                 <span><img src="<%- content.mission_image %>" alt=""></i></span>
                               </div>
                               <div class="it-about-3-mv-item">
-                                 <span class="it-about-3-mv-title">Our Mission</span>
-                                 <p>We promote practices to enhance the rational thinking, concern to the nature, dignity Of labour, fraternity and the freedom of thought and expression.</p>
+                                 <span class="it-about-3-mv-title"><%- content.mission_heading %></span>
+                                 <%- content.mission_description %>
                               </div>
                            </div>
                         </div>
                         <div class="col-xl-12">
                            <div class="it-about-4-list-wrap d-flex align-items-start">
                               <div class="it-about-4-list-icon">
-                                 <span><img src="assets/img/our-vision.png" alt=""></span>
+                                 <span><img src="<%- content.vision_image %>" alt=""></span>
                               </div>
                               <div class="it-about-3-mv-item">
-                                 <span class="it-about-3-mv-title">Our Vision</span>
-                                 <p>We aim at the inculcation of scientific, aesthetic and democratic temperament among the children.</p>
+                                 <span class="it-about-3-mv-title"><%- content.vision_heading %></span>
+                                 <%- content.vision_description %>
                               </div>
                            </div>
                         </div>

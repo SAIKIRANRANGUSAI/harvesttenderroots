@@ -356,20 +356,24 @@
 
                         <div class="form-group">
                             <label class="form-label">Main Heading</label>
-                            <input type="text" name="main_heading" class="form-input"
-                                value="<%= content.main_heading || '' %>" placeholder="Enter main heading">
+                            <!-- <input type="text" name="main_heading" class="form-input"
+                                value="<%= content.main_heading || '' %>" placeholder="Enter main heading"> -->
+                                <textarea id="main_heading" name="main_heading"
+                                class="form-input"><%= content.main_heading || '' %></textarea>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Main Description</label>
                             <textarea id="main_description" name="main_description"
-                                class="form-input"><%= content.homeabout_heading || '' %></textarea>
+                                class="form-input"><%= content.main_description || '' %></textarea>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">homeAbout Heading</label>
-                            <input type="text" name="homeabout_heading" class="form-input"
-                                value="<%= content.homeabout_heading || '' %>" placeholder="Enter homeabout heading">
+                            <!-- <input type="text" name="homeabout_heading" class="form-input"
+                                value="<%= content.homeabout_heading || '' %>" placeholder="Enter homeabout heading"> -->
+                                <textarea id="homeabout_heading" name="homeabout_heading"
+                                class="form-input"><%= content.homeabout_heading || '' %></textarea>
                         </div>
 
                         <div class="form-group">
@@ -410,8 +414,8 @@
 
                         <div class="form-group">
                             <label class="form-label">About Home Heading</label>
-                            <input type="text" name="about_home_heading" class="form-input"
-                                value="<%= content.about_home_heading || '' %>" placeholder="Enter about home heading">
+                            <textarea id="about_home_heading" name="about_home_heading"
+                                class="form-input"><%= content.about_home_heading || '' %></textarea>
                         </div>
 
                         <div class="form-group">
@@ -536,7 +540,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 // Initialize CKEditor 5 for all textareas in About Us section
-                ['main_description', 'about_home_description', 'mission_description', 'vision_description', 'homeabout_description'].forEach(function (id) {
+                ['main_heading','main_description', 'about_home_heading','about_home_description', 'mission_description', 'vision_description', 'homeabout_description', 'homeabout_heading'].forEach(function (id) {
                     var el = document.getElementById(id);
                     if (el) {
                         ClassicEditor.create(el, {
@@ -549,6 +553,186 @@
                 });
             });
         </script>
+
+        <!-- why choose us section -->
+        <!-- Why Choose Us Section -->
+<div class="content">
+  <div class="page-header">
+    <h1 class="page-title">Why Choose Us</h1>
+    <div class="breadcrumb">
+      <a href="/admin/dashboard">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Why Choose Us</span>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <div class="section-header">
+      <h2 class="section-title">Manage Why Choose Us Content</h2>
+      <button type="submit" form="whyChooseUsForm" class="btn btn-success">
+        <i class="fas fa-save"></i> Save All Changes
+      </button>
+    </div>
+
+    <form id="whyChooseUsForm" action="/admin/why-choose-us/update" method="POST">
+
+      <!-- Main Heading -->
+      <div class="form-group">
+        <label class="form-label">Main Heading</label>
+        <input type="text" name="main_heading" class="form-input"
+          value="<%= why.main_heading || '' %>" placeholder="Enter main heading">
+      </div>
+
+      <!-- Main Description -->
+      <div class="form-group">
+        <label class="form-label">Main Description</label>
+        <textarea name="main_description" class="form-input ckeditor" rows="5"
+          placeholder="Enter main description"><%= why.main_description || '' %></textarea>
+      </div>
+
+      <!-- Celebrations YouTube Link -->
+      <div class="form-group">
+        <label class="form-label">Celebrations YouTube Link</label>
+        <input type="url" name="celebration_link" class="form-input"
+          value="<%= why.celebration_link || '' %>" placeholder="https://youtube.com/embed/...">
+      </div>
+
+      <hr>
+
+      <!-- Values -->
+      <h3 style="margin-top:20px; color: var(--primary);">Our Values</h3>
+      <div class="form-group">
+        <label class="form-label">Values Heading</label>
+        <input type="text" name="values_heading" class="form-input"
+          value="<%= why.values_heading || '' %>" placeholder="Enter values heading">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Values Description</label>
+        <textarea name="values_description" class="form-input ckeditor" rows="4"
+          placeholder="Enter values description"><%= why.values_description || '' %></textarea>
+      </div>
+
+      <hr>
+
+      <!-- Mission -->
+      <h3 style="margin-top:20px; color: var(--success);">Our Mission</h3>
+      <div class="form-group">
+        <label class="form-label">Mission Heading</label>
+        <input type="text" name="mission_heading" class="form-input"
+          value="<%= why.mission_heading || '' %>" placeholder="Enter mission heading">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mission Description</label>
+        <textarea name="mission_description" class="form-input ckeditor" rows="4"
+          placeholder="Enter mission description"><%= why.mission_description || '' %></textarea>
+      </div>
+
+      <hr>
+
+      <!-- Vision -->
+      <h3 style="margin-top:20px; color: var(--warning);">Our Vision</h3>
+      <div class="form-group">
+        <label class="form-label">Vision Heading</label>
+        <input type="text" name="vision_heading" class="form-input"
+          value="<%= why.vision_heading || '' %>" placeholder="Enter vision heading">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vision Description</label>
+        <textarea name="vision_description" class="form-input ckeditor" rows="4"
+          placeholder="Enter vision description"><%= why.vision_description || '' %></textarea>
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footers">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- CKEditor Script -->
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<script>
+  CKEDITOR.replaceAll('ckeditor');
+</script>
+
+ <!-- Fun Classes Section -->
+
+ <!-- Fun Classes Section -->
+<div class="content">
+  <div class="page-header">
+    <h1 class="page-title">Fun Classes</h1>
+    <div class="breadcrumb">
+      <a href="/admin/dashboard">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Fun Classes</span>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <div class="section-header">
+      <h2 class="section-title">Manage Fun Classes</h2>
+      <button type="submit" form="funClassesForm" class="btn btn-success">
+        <i class="fas fa-save"></i> Save All Changes
+      </button>
+    </div>
+
+    <form id="funClassesForm" action="/admin/fun-classes/update" method="POST" enctype="multipart/form-data">
+
+      <!-- Heading -->
+      <div class="form-group">
+        <label class="form-label">Heading</label>
+        <textarea name="heading" class="form-input ckeditor" rows="2"><%= fun.heading || '' %></textarea>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-input ckeditor" rows="5"><%= fun.description || '' %></textarea>
+      </div>
+
+      <!-- YouTube Link -->
+      <div class="form-group">
+        <label class="form-label">YouTube Link</label>
+        <input type="url" name="youtube_link" class="form-input"
+          value="<%= fun.youtube_link || '' %>" placeholder="https://youtube.com/embed/...">
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label class="form-label">Image</label>
+        <% if (fun.image) { %>
+          <div style="margin-bottom:10px;">
+            <img src="<%= fun.image %>" alt="Fun Class Image" style="max-width: 200px; border:1px solid #ccc; border-radius:8px;">
+          </div>
+        <% } %>
+        <input type="file" name="image" class="form-input">
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footers">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- CKEditor -->
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<script>
+  CKEDITOR.replaceAll('ckeditor');
+</script>
+
+
+
+
+
 
 
         </div>
