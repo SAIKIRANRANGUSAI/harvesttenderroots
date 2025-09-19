@@ -11,6 +11,16 @@ const { isAuthenticated } = Controller;
 // Multer setup
 const storage = multer.diskStorage({});
 const upload = multer({ storage });
+// const storage = new CloudinaryStorage({
+//   cloudinary,
+//   params: {
+//     folder: "school/messages",
+//     allowed_formats: ["jpg", "jpeg", "png", "webp"],
+//     transformation: [{ width: 400, height: 400, crop: "fill" }],
+//   },
+// });
+
+// const upload = multer({ storage });
 
 
 // ✅ Login page (GET)
@@ -56,7 +66,13 @@ router.get("/home", isAuthenticated, async (req, res) => {
     const why     = whyRows[0] || {};
     const [rowsf] = await db.query("SELECT * FROM fun_classes WHERE id = 1");
     const fun = rowsf[0] || {};
-    res.render("admin/admin_home", { homeContent, values, content, why, fun });
+    const [slides] = await db.query("SELECT * FROM beyond_classrooms ORDER BY id ASC");
+
+    const [rowsx] = await db.query("SELECT * FROM fun_facts LIMIT 1");
+    const funFacts = rowsx[0] || {};
+    
+  
+    res.render("admin/admin_home", { homeContent, values, content, why, fun, slides, funFacts});
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
@@ -326,32 +342,44 @@ router.post("/site-content/update", isAuthenticated, upload.fields([
 // =======================
 // WHY CHOOSE US (with Cloudinary)
 // =======================
+
+
 router.post("/why-choose-us/update", upload.single("image"), isAuthenticated, async (req, res) => {
   try {
     const body = req.body;
-    let image = null;
+
+    // Convert empty strings to null
+    Object.keys(body).forEach(key => {
+      if (body[key] === "") body[key] = null;
+    });
 
     // Upload new image if provided
+    let image = null;
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "harvesttenderroots/why-choose-us"
       });
       image = result.secure_url;
-      fs.unlinkSync(req.file.path); // remove local temp file
+
+      try { fs.unlinkSync(req.file.path); } 
+      catch (err) { console.warn("Temp file not found, skipping delete:", err.message); }
+
+      console.log("Cloudinary URL:", image); // check if URL is coming
     }
 
+    // Fetch existing row
     const [rows] = await db.query("SELECT * FROM why_choose_us WHERE id = 1");
     const content = rows[0] || {};
 
     if (!content.id) {
-      // Insert
+      // Insert new row
       await db.query(
         `INSERT INTO why_choose_us 
-        (main_heading, main_description, celebration_link,
-         values_heading, values_description,
-         mission_heading, mission_description,
-         vision_heading, vision_description, image)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          (main_heading, main_description, celebration_link,
+           values_heading, values_description,
+           mission_heading, mission_description,
+           vision_heading, vision_description, image)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           body.main_heading,
           body.main_description,
@@ -366,7 +394,7 @@ router.post("/why-choose-us/update", upload.single("image"), isAuthenticated, as
         ]
       );
     } else {
-      // Update
+      // Update existing row
       await db.query(
         `UPDATE why_choose_us SET
           main_heading = ?, 
@@ -397,11 +425,10 @@ router.post("/why-choose-us/update", upload.single("image"), isAuthenticated, as
 
     res.redirect("/admin/home");
   } catch (err) {
-    console.error(err);
+    console.error("WHY CHOOSE US update error:", err);
     res.status(500).send("Server error");
   }
 });
-
 
 // =======================
 // FUN CLASSES (with Cloudinary)
@@ -454,10 +481,12 @@ router.post("/fun-classes/update", upload.single("image"), isAuthenticated, asyn
 router.get("/about-us", async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM school_info ORDER BY id ASC");
+    const [messages] = await db.query("SELECT * FROM messages ORDER BY id ASC");
     res.render("admin/admin_about-us", {
       infoList: rows,
       formMode: false,
       info: null,
+      messages,
     });
   } catch (err) {
     console.error("Error fetching about us info:", err);
@@ -542,5 +571,384 @@ router.get("/about-us/delete/:id", async (req, res) => {
   }
 });
 
+
+// =======================
+// GET ALL PRINCIPAL MESSAGES (Admin Page)
+// =======================
+router.get("/principal-message", async (req, res) => {
+  try {
+    const [messages] = await db.query("SELECT * FROM principal_message ORDER BY id DESC");
+    res.render("admin/principal-message", { messages });
+  } catch (err) {
+    console.error("Error fetching principal messages:", err);
+    res.status(500).send("Error loading principal messages");
+  }
+});
+
+
+// =======================
+// ADD PRINCIPAL MESSAGE (with Cloudinary)
+// =======================
+router.post("/principal-message/add", upload.single("image"), async (req, res) => {
+  try {
+    const {
+      name,
+      role,
+      message_to_students,
+      message_to_staff,
+      social_facebook,
+      social_twitter,
+      social_skype,
+      social_linkedin,
+    } = req.body;
+
+    let imageUrl = null;
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "harvesttenderroots/principal-message",
+      });
+      imageUrl = result.secure_url;
+      fs.unlinkSync(req.file.path);
+    }
+
+    await db.query(
+      `INSERT INTO principal_message 
+      (name, role, image, message_to_students, message_to_staff, social_facebook, social_twitter, social_skype, social_linkedin)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        name,
+        role,
+        imageUrl,
+        message_to_students,
+        message_to_staff,
+        social_facebook,
+        social_twitter,
+        social_skype,
+        social_linkedin,
+      ]
+    );
+
+    res.redirect("/admin/principal-message");
+  } catch (err) {
+    console.error("Error adding principal message:", err);
+    res.status(500).send("Error adding principal message");
+  }
+});
+
+
+// =======================
+// EDIT PRINCIPAL MESSAGE
+// =======================
+router.post("/principal-message/edit/:id", upload.single("image"), async (req, res) => {
+  try {
+    const {
+      name,
+      role,
+      message_to_students,
+      message_to_staff,
+      social_facebook,
+      social_twitter,
+      social_skype,
+      social_linkedin,
+      existing_image,
+    } = req.body;
+
+    const id = req.params.id;
+    let imageUrl = existing_image || null;
+
+    if (req.file) {
+      try {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "harvesttenderroots/principal-message",
+        });
+        imageUrl = result.secure_url;
+        fs.unlinkSync(req.file.path);
+      } catch (cloudErr) {
+        console.error("Cloudinary upload failed:", cloudErr);
+      }
+    }
+
+    await db.query(
+      `UPDATE principal_message 
+       SET name=?, role=?, image=?, message_to_students=?, message_to_staff=?, 
+           social_facebook=?, social_twitter=?, social_skype=?, social_linkedin=? 
+       WHERE id=?`,
+      [
+        name,
+        role,
+        imageUrl,
+        message_to_students,
+        message_to_staff,
+        social_facebook,
+        social_twitter,
+        social_skype,
+        social_linkedin,
+        id,
+      ]
+    );
+
+    res.redirect("/admin/principal-message");
+  } catch (err) {
+    console.error("Error editing principal message:", err);
+    res.status(500).send("Error editing principal message");
+  }
+});
+
+
+// =======================
+// DELETE PRINCIPAL MESSAGE
+// =======================
+router.post("/principal-message/delete/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const [rows] = await db.query("SELECT image FROM principal_message WHERE id=?", [id]);
+
+    if (rows.length && rows[0].image) {
+      const imageUrl = rows[0].image;
+
+      try {
+        const urlParts = imageUrl.split("/");
+        const fileName = urlParts.pop();
+        const folderPath = urlParts.slice(urlParts.indexOf("harvesttenderroots")).join("/");
+        const publicId = `${folderPath}/${fileName.split(".")[0]}`;
+
+        await cloudinary.uploader.destroy(publicId);
+      } catch (cloudErr) {
+        console.error("Cloudinary delete failed:", cloudErr);
+      }
+    }
+
+    await db.query("DELETE FROM principal_message WHERE id=?", [id]);
+
+    res.redirect("/admin/principal-message");
+  } catch (err) {
+    console.error("Error deleting principal message:", err);
+    res.status(500).send("Error deleting principal message");
+  }
+});
+
+
+router.post("/beyond-classrooms/create", isAuthenticated, upload.single("image"), async (req, res) => {
+  try {
+    const { title } = req.body;
+    let imageUrl = null;
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "harvesttenderroots/beyond-classrooms"
+      });
+      imageUrl = result.secure_url;
+      fs.unlinkSync(req.file.path);
+    }
+
+    await db.query(
+      "INSERT INTO beyond_classrooms (title, image) VALUES (?, ?)",
+      [title, imageUrl]
+    );
+
+    res.redirect("/admin/home#beyond-classrooms");
+  } catch (err) {
+    console.error("Error creating beyond classroom slide:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// POST Update Beyond Classroom Slide
+router.post("/beyond-classrooms/update/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, existing_image } = req.body;
+    
+    let imageUrl = existing_image || null;
+
+    if (req.file) {
+      // Delete old image from Cloudinary if exists
+      if (existing_image) {
+        try {
+          const urlParts = existing_image.split("/");
+          const fileName = urlParts.pop();
+          const folderPath = urlParts.slice(urlParts.indexOf("harvesttenderroots")).join("/");
+          const publicId = `${folderPath}/${fileName.split(".")[0]}`;
+          await cloudinary.uploader.destroy(publicId);
+        } catch (cloudErr) {
+          console.error("Cloudinary delete failed:", cloudErr);
+        }
+      }
+      
+      // Upload new image
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "harvesttenderroots/beyond-classrooms"
+      });
+      imageUrl = result.secure_url;
+      fs.unlinkSync(req.file.path);
+    }
+
+    await db.query(
+      "UPDATE beyond_classrooms SET title = ?, image = ? WHERE id = ?",
+      [title, imageUrl, id]
+    );
+
+    res.redirect("/admin/home#beyond-classrooms");
+  } catch (err) {
+    console.error("Error updating beyond classroom slide:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// POST Delete Beyond Classroom Slide
+router.post("/beyond-classrooms/delete/:id", isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get the slide to delete its image from Cloudinary
+    const [rows] = await db.query("SELECT image FROM beyond_classrooms WHERE id = ?", [id]);
+    
+    if (rows.length && rows[0].image) {
+      try {
+        const imageUrl = rows[0].image;
+        const urlParts = imageUrl.split("/");
+        const fileName = urlParts.pop();
+        const folderPath = urlParts.slice(urlParts.indexOf("harvesttenderroots")).join("/");
+        const publicId = `${folderPath}/${fileName.split(".")[0]}`;
+        
+        await cloudinary.uploader.destroy(publicId);
+      } catch (cloudErr) {
+        console.error("Cloudinary delete failed:", cloudErr);
+      }
+    }
+
+    await db.query("DELETE FROM beyond_classrooms WHERE id = ?", [id]);
+    res.redirect("/admin/home#beyond-classrooms");
+  } catch (err) {
+    console.error("Error deleting beyond classroom slide:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.post(
+  "/fun-facts/update",
+  isAuthenticated,
+  upload.fields([
+    { name: "image1", maxCount: 1 },
+    { name: "image2", maxCount: 1 },
+    { name: "image3", maxCount: 1 },
+    { name: "image4", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const body = req.body;
+
+      const [rows] = await db.query("SELECT * FROM fun_facts LIMIT 1");
+      const funFacts = rows[0] || {};
+
+      const uploadImage = async (file, folder) => {
+        if (!file) return null;
+        const result = await cloudinary.uploader.upload(file.path, { folder });
+        fs.unlinkSync(file.path);
+        return result.secure_url;
+      };
+
+      const image1 = req.files["image1"] ? await uploadImage(req.files["image1"][0], "fun-facts") : funFacts.image1;
+      const image2 = req.files["image2"] ? await uploadImage(req.files["image2"][0], "fun-facts") : funFacts.image2;
+      const image3 = req.files["image3"] ? await uploadImage(req.files["image3"][0], "fun-facts") : funFacts.image3;
+      const image4 = req.files["image4"] ? await uploadImage(req.files["image4"][0], "fun-facts") : funFacts.image4;
+
+      if (!funFacts.id) {
+        // Insert new row
+        await db.query(
+          `INSERT INTO fun_facts 
+            (heading1, number1, image1, heading2, number2, image2, heading3, number3, image3, heading4, number4, image4)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            body.heading1, body.number1, image1,
+            body.heading2, body.number2, image2,
+            body.heading3, body.number3, image3,
+            body.heading4, body.number4, image4
+          ]
+        );
+      } else {
+        // Update existing row
+        await db.query(
+          `UPDATE fun_facts SET 
+            heading1=?, number1=?, image1=?,
+            heading2=?, number2=?, image2=?,
+            heading3=?, number3=?, image3=?,
+            heading4=?, number4=?, image4=?
+           WHERE id=?`,
+          [
+            body.heading1, body.number1, image1,
+            body.heading2, body.number2, image2,
+            body.heading3, body.number3, image3,
+            body.heading4, body.number4, image4,
+            funFacts.id
+          ]
+        );
+      }
+
+      res.redirect("/admin/home");
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Server error");
+    }
+  }
+);
+// GET admin admission page
+router.get('/admission', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM admission_info LIMIT 1');
+    res.render('admin/admin_admission', { admission: rows[0] || null, currentPage: 'admission' });
+  } catch (error) {
+    console.error(error);
+    res.send('Error loading admission page');
+  }
+});
+
+// POST: Update admission info
+router.post('/admission/update', upload.single('image'), async (req, res) => {
+  try {
+    const { content, currentImage } = req.body;
+    console.log('Received content:', content);
+    console.log('Received currentImage:', currentImage);
+    console.log('Received file:', req.file); // Check if multer is getting the file
+
+    let imageUrl = currentImage || null;
+
+    // Upload new image to Cloudinary if provided
+    if (req.file) {
+      console.log('Uploading new image to Cloudinary...');
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "harvesttenderroots/admission",
+      });
+      imageUrl = result.secure_url;
+
+      // Delete the temp file
+      fs.unlinkSync(req.file.path);
+    }
+
+    // Check if a row already exists
+    const [rows] = await db.query('SELECT * FROM admission_info LIMIT 1');
+    console.log('Existing rows:', rows);
+
+    if (rows.length > 0) {
+      await db.query(
+        'UPDATE admission_info SET content = ?, image = ? WHERE id = ?',
+        [content, imageUrl, rows[0].id]
+      );
+    } else {
+      await db.query(
+        'INSERT INTO admission_info (content, image) VALUES (?, ?)',
+        [content, imageUrl]
+      );
+    }
+
+    console.log('Admission info updated successfully!');
+    res.redirect('/admin/admission');
+  } catch (error) {
+    console.error('Error updating admission info:', error);
+    res.send('Error updating admission info');
+  }
+});
 
 module.exports = router;

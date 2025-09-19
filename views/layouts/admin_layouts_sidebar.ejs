@@ -7,36 +7,49 @@
 
     <div class="sidebar-menu">
         <div class="menu-label">Main</div>
-        <a href="/admin/dashboard" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'dashboard') ? 'active' : '' %>">
+        <a href="/admin/dashboard"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'dashboard') ? 'active' : '' %>">
             <i class="fas fa-home"></i>
             <span>Dashboard</span>
         </a>
 
-        <a href="/admin/home" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'home') ? 'active' : '' %>">
+        <a href="/admin/home"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'home') ? 'active' : '' %>">
             <i class="fas fa-house-user"></i>
             <span>Home</span>
         </a>
 
         <div class="menu-label">Content</div>
-        <a href="/admin/about-us" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'about-us') ? 'active' : '' %>">
+        <a href="/admin/about-us"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'about-us') ? 'active' : '' %>">
             <i class="fas fa-info-circle"></i>
             <span>About Us</span>
         </a>
-        <a href="/admin/academics" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'academics') ? 'active' : '' %>">
-            <i class="fas fa-book-open"></i>
-            <span>Academics</span>
+        <a href="/admin/principal-message"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'principal-message') ? 'active' : '' %>">
+            <i class="fas fa-info-circle"></i>
+            <span>principal-message</span>
         </a>
-        <a href="/admin/course" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'course') ? 'active' : '' %>">
+        <a href="/admin/admission"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'admission') ? 'active' : '' %>">
+            <i class="fas fa-file-alt"></i>
+            <span>Admission</span>
+        </a>
+
+        <a href="/admin/course"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'course') ? 'active' : '' %>">
             <i class="fas fa-graduation-cap"></i>
             <span>Courses</span>
         </a>
-        <a href="/admin/student-life" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'student-life') ? 'active' : '' %>">
+        <a href="/admin/student-life"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'student-life') ? 'active' : '' %>">
             <i class="fas fa-users"></i>
             <span>Student Life</span>
         </a>
-        
+
         <div class="menu-label">Settings</div>
-        <a href="/admin/settings" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'settings') ? 'active' : '' %>">
+        <a href="/admin/settings"
+            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'settings') ? 'active' : '' %>">
             <i class="fas fa-cog"></i>
             <span>Settings</span>
         </a>

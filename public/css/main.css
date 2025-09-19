@@ -8138,7 +8138,7 @@ input[type="color"] {
   top: 0;
   left: 0;
   width: 100%;
-  height: 0%;
+  height: 250px;
   content: "";
   opacity: 0;
   visibility: hidden;
@@ -8148,7 +8148,10 @@ input[type="color"] {
 .it-team-3-thumb img {
   border-radius: 5px 5px 0 0;
   width: 100%;
+  aspect-ratio: 103/119;
+  object-fit: cover;
   transition: 0.9s;
+  /* max-height: 320px; */
 }
 .it-team-3-title {
   color: var(--it-common-white);

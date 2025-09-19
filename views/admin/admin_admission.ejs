@@ -1,0 +1,75 @@
+<%- include('../layouts/admin_layouts_header', { title: 'Admin | Admission Section', currentPage: 'admission' }) %>
+<%- include('../layouts/admin_layouts_sidebar', { currentPage: 'admission' }) %>
+
+<style>
+    .sai {
+        padding: 10px 30px !important;
+    }
+
+    .ck.ck-editor__main>.ck-editor__editable {
+    border-color: var(--ck-color-base-border);
+    padding: 10px 30px;
+}
+</style>
+
+
+
+<div class="main-content">
+    <div class="content">
+        <div class="page-header">
+            <h1 class="page-title">Admission Section</h1>
+        </div>
+
+        <div class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">Manage Admission Content</h2>
+            </div>
+
+            <form action="/admin/admission/update" method="POST" enctype="multipart/form-data">
+                <!-- Content Field -->
+                <div class="form-group ">
+                    <label class="form-label">Content</label>
+                    <textarea name="content" id="admissionContent" class="form-input sai " rows="10"><%= admission?.content || '' %></textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="form-group">
+                    <label class="form-label">Image</label>
+                    
+                    <% if (admission && admission.image) { %>
+                        <div style="margin-bottom: 10px; text-align: center;">
+                            <p style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Current Image:</p>
+                            <img src="<%= admission.image %>" alt="Current Image" 
+                                style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        </div>
+                        <input type="hidden" name="currentImage" value="<%= admission.image %>">
+                    <% } %>
+                    
+                    <input type="file" name="image" class="form-input" accept="image/*">
+                    <small class="text-muted">Upload a new image to replace the current one</small>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-footers">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- CKEditor 4.25.1 LTS (Latest Free Version) -->
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        ClassicEditor
+            .create(document.querySelector('#admissionContent'))
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>
+<%- include('../layouts/admin_layouts_footer') %>

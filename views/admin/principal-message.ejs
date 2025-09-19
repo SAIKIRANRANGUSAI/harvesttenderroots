@@ -1,0 +1,740 @@
+<%- include('../layouts/admin_layouts_header', { title: 'Admin | Principal Messages' , currentPage: 'principal-message'
+    }) %>
+    <%- include('../layouts/admin_layouts_sidebar', { currentPage: 'principal-message' }) %>
+
+        <!-- Principal Messages Section -->
+        <div class="messages-section">
+            <div class="messages-header d-flex justify-content-between align-items-center">
+                <h2 class="messages-title">Principal / Correspondent Messages</h2>
+                <button class="btn btn-primary" onclick="toggleMessagesForm()">
+                    <i class="fas fa-plus"></i> Add New Message
+                </button>
+            </div>
+
+            <!-- Add New Message Form -->
+            <div id="messagesAddForm" class="messages-form-card mt-3" style="display: none;">
+                <div class="messages-card-body">
+                    <form method="POST" action="/admin/principal-message/add" enctype="multipart/form-data"
+                        id="messagesForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Name *</label>
+                                <textarea name="name" class="messages-form-control" id="messagesName"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Role/Designation *</label>
+                                <textarea name="role" class="messages-form-control" id="messagesRole"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Profile Image</label>
+                                <input type="file" name="image" class="messages-form-control" accept="image/*">
+                                <small class="messages-form-text">Recommended: 400x400px, JPG/PNG format</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Facebook</label>
+                                <input type="url" name="social_facebook" class="messages-form-control"
+                                    placeholder="https://facebook.com/username">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Twitter</label>
+                                <input type="url" name="social_twitter" class="messages-form-control"
+                                    placeholder="https://twitter.com/username">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Skype</label>
+                                <input type="text" name="social_skype" class="messages-form-control"
+                                    placeholder="Skype ID">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">LinkedIn</label>
+                                <input type="url" name="social_linkedin" class="messages-form-control"
+                                    placeholder="https://linkedin.com/in/username">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="messages-form-label">Message to Students</label>
+                                <textarea name="message_to_students" class="messages-form-control"
+                                    id="messagesStudents"></textarea>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="messages-form-label">Message to Staff</label>
+                                <textarea name="message_to_staff" class="messages-form-control"
+                                    id="messagesStaff"></textarea>
+                            </div>
+                        </div>
+                        <div class="messages-form-footer">
+                            <button type="submit" class="btn btn-primary">Save Message</button>
+
+                            <button type="button" class="btn btn-danger" onclick="toggleMessagesForm()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- List of Messages -->
+            <div class="messages-table-responsive mt-4">
+                <table class="messages-data-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Role/Designation</th>
+                            <th>Social Links</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (messages && messages.length> 0) { %>
+                            <% messages.forEach((msg, index)=> { %>
+                                <tr class="messages-table-row" data-id="<%= msg.id %>"
+                                    data-name='<%- JSON.stringify(msg.name || "") %>'
+                                    data-role='<%- JSON.stringify(msg.role || "") %>'
+                                    data-image='<%- JSON.stringify(msg.image || "") %>'
+                                    data-social_facebook='<%- JSON.stringify(msg.social_facebook || "") %>'
+                                    data-social_twitter='<%- JSON.stringify(msg.social_twitter || "") %>'
+                                    data-social_skype='<%- JSON.stringify(msg.social_skype || "") %>'
+                                    data-social_linkedin='<%- JSON.stringify(msg.social_linkedin || "") %>'
+                                    data-message_to_students='<%- JSON.stringify(msg.message_to_students || "") %>'
+                                    data-message_to_staff='<%- JSON.stringify(msg.message_to_staff || "") %>'
+                                    style="background: <%= index % 2 === 0 ? '#f8f9fa' : 'white' %>;">
+                                    <td>
+                                        <% if (msg.image) { %>
+                                            <img src="<%= msg.image %>" alt="<%= msg.name %>"
+                                                class="messages-table-image">
+                                            <% } else { %>
+                                                <div class="messages-table-image-placeholder">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <% } %>
+                                    </td>
+                                    <td class="messages-table-name">
+                                        <%= msg.name.replace(/<\/?[^>]+(>|$)/g, "") %>
+                                    </td>
+                                    <td class="messages-table-role">
+                                        <%= msg.role.replace(/<\/?[^>]+(>|$)/g, "") %>
+                                    </td>
+
+                                    <td>
+                                        <div class="messages-social-links">
+                                            <% if (msg.social_facebook) { %>
+                                                <a href="<%= msg.social_facebook %>" target="_blank"
+                                                    class="messages-social-link messages-social-facebook"
+                                                    title="Facebook">
+                                                    <i class="fab fa-facebook-f"></i>
+                                                </a>
+                                                <% } %>
+                                                    <% if (msg.social_twitter) { %>
+                                                        <a href="<%= msg.social_twitter %>" target="_blank"
+                                                            class="messages-social-link messages-social-twitter"
+                                                            title="Twitter">
+                                                            <i class="fab fa-twitter"></i>
+                                                        </a>
+                                                        <% } %>
+                                                            <% if (msg.social_skype) { %>
+                                                                <a href="skype:<%= msg.social_skype %>?call"
+                                                                    class="messages-social-link messages-social-skype"
+                                                                    title="Skype">
+                                                                    <i class="fab fa-skype"></i>
+                                                                </a>
+                                                                <% } %>
+                                                                    <% if (msg.social_linkedin) { %>
+                                                                        <a href="<%= msg.social_linkedin %>"
+                                                                            target="_blank"
+                                                                            class="messages-social-link messages-social-linkedin"
+                                                                            title="LinkedIn">
+                                                                            <i class="fab fa-linkedin-in"></i>
+                                                                        </a>
+                                                                        <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="messages-actions">
+                                            <!-- Edit Button -->
+                                            <button class="btn btn-sm btn-warning"
+                                                onclick="openMessagesEditModal(<%= msg.id %>)">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+
+                                            <!-- Delete Button -->
+                                            <form action="/admin/principal-message/delete/<%= msg.id %>" method="POST"
+                                                class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Are you sure you want to delete this message?')">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="5" class="messages-no-data">
+                                                <i class="fas fa-comments"></i>
+                                                <p>No messages found. Add your first message.</p>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Edit Modal for Messages -->
+        <div id="messagesEditModal" class="messages-modal">
+            <div class="messages-modal-content">
+                <div class="messages-modal-header">
+                    <h5 class="messages-modal-title">Edit Message</h5>
+                    <button type="button" class="messages-modal-close" onclick="closeMessagesEditModal()">×</button>
+                </div>
+                <form method="POST" action="" enctype="multipart/form-data" id="messagesEditForm">
+                    <input type="hidden" name="id" id="messagesEditId">
+                    <div class="messages-modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Name *</label>
+                                <textarea name="name" class="messages-form-control" id="messagesEditName"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Role/Designation *</label>
+                                <textarea name="role" class="messages-form-control" id="messagesEditRole"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Profile Image</label>
+                                <div id="messagesCurrentImageContainer" class="mb-2"></div>
+                                <input type="file" name="image" class="messages-form-control" accept="image/*">
+                                <input type="hidden" name="existing_image" id="messagesEditExistingImage">
+                                <small class="messages-form-text">Leave empty to keep current image</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Facebook</label>
+                                <input type="url" name="social_facebook" class="messages-form-control"
+                                    id="messagesEditFacebook" placeholder="https://facebook.com/username">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Twitter</label>
+                                <input type="url" name="social_twitter" class="messages-form-control"
+                                    id="messagesEditTwitter" placeholder="https://twitter.com/username">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">Skype</label>
+                                <input type="text" name="social_skype" class="messages-form-control"
+                                    id="messagesEditSkype" placeholder="Skype ID">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="messages-form-label">LinkedIn</label>
+                                <input type="url" name="social_linkedin" class="messages-form-control"
+                                    id="messagesEditLinkedin" placeholder="https://linkedin.com/in/username">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="messages-form-label">Message to Students</label>
+                                <textarea name="message_to_students" class="messages-form-control sai"
+                                    id="messagesEditStudents"></textarea>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="messages-form-label">Message to Staff</label>
+                                <textarea name="message_to_staff" class="messages-form-control"
+                                    id="messagesEditStaff"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="messages-modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="closeMessagesEditModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Load Latest Secure CKEditor 4 -->
+        <!-- Load CKEditor 5 Classic -->
+        <!-- 1) CKEditor 5 Classic (free) -->
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+
+        <script>
+            /* ===== CKEditor5 lazy init + safe sync for Add/Edit forms ===== */
+
+            const shortToolbar = ['heading', '|', 'bold', 'italic', 'link', '|', 'undo', 'redo'];
+            const longToolbar = ['heading', '|', 'bold', 'italic', 'link', '|',
+                'bulletedList', 'numberedList', 'blockQuote', '|', 'insertTable', 'undo', 'redo'];
+
+            let addEditors = { name: null, role: null, students: null, staff: null };
+            let editEditors = { name: null, role: null, students: null, staff: null };
+            let addInited = false;
+            let editInited = false;
+
+            /* Initialize Add form editors (called when Add form is shown) */
+            function initAddEditors() {
+                if (addInited) return Promise.resolve();
+                // ensure form visible (editor needs layout). caller should show form first.
+                const p = Promise.all([
+                    ClassicEditor.create(document.querySelector('#messagesName'), { toolbar: shortToolbar })
+                        .then(editor => addEditors.name = editor),
+                    ClassicEditor.create(document.querySelector('#messagesRole'), { toolbar: shortToolbar })
+                        .then(editor => addEditors.role = editor),
+                    ClassicEditor.create(document.querySelector('#messagesStudents'), { toolbar: longToolbar })
+                        .then(editor => addEditors.students = editor),
+                    ClassicEditor.create(document.querySelector('#messagesStaff'), { toolbar: longToolbar })
+                        .then(editor => addEditors.staff = editor)
+                ]).then(() => { addInited = true; })
+                    .catch(err => console.error('initAddEditors error', err));
+                return p;
+            }
+
+            /* Initialize Edit modal editors (called when Edit modal opens) */
+            function initEditEditors() {
+                if (editInited) return Promise.resolve();
+                const p = Promise.all([
+                    ClassicEditor.create(document.querySelector('#messagesEditName'), { toolbar: shortToolbar })
+                        .then(editor => editEditors.name = editor),
+                    ClassicEditor.create(document.querySelector('#messagesEditRole'), { toolbar: shortToolbar })
+                        .then(editor => editEditors.role = editor),
+                    ClassicEditor.create(document.querySelector('#messagesEditStudents'), { toolbar: longToolbar })
+                        .then(editor => editEditors.students = editor),
+                    ClassicEditor.create(document.querySelector('#messagesEditStaff'), { toolbar: longToolbar })
+                        .then(editor => editEditors.staff = editor)
+                ]).then(() => { editInited = true; })
+                    .catch(err => console.error('initEditEditors error', err));
+                return p;
+            }
+
+            /* Toggle Add form visibility and init editors lazily */
+            function toggleMessagesForm() {
+                const form = document.getElementById('messagesAddForm');
+                const isHidden = (getComputedStyle(form).display === 'none' || form.style.display === 'none');
+                if (isHidden) {
+                    // show then initialize (so editor can compute layout)
+                    form.style.display = 'block';
+                    // small timeout to allow browser layout (safe)
+                    setTimeout(() => initAddEditors(), 80);
+                } else {
+                    form.style.display = 'none';
+                    // we keep editors alive to avoid re-init cost; if you want to destroy, call editor.destroy() here
+                }
+            }
+
+            /* Open Edit modal -> populate form values -> init editors and set data */
+            function openMessagesEditModal(messageId) {
+                // Find the row by data-id (more reliable than searching by button)
+                const row = document.querySelector(`.messages-table-row[data-id="${messageId}"]`);
+                if (!row) {
+                    console.error('Message row not found for id', messageId);
+                    alert('Error loading message data. Refresh page and try again.');
+                    return;
+                }
+
+                // parse values from dataset (they were JSON-encoded when rendering)
+                const message = {
+                    id: row.dataset.id,
+                    name: JSON.parse(row.dataset.name || '""'),
+                    role: JSON.parse(row.dataset.role || '""'),
+                    image: JSON.parse(row.dataset.image || '""'),
+                    social_facebook: JSON.parse(row.dataset.social_facebook || '""'),
+                    social_twitter: JSON.parse(row.dataset.social_twitter || '""'),
+                    social_skype: JSON.parse(row.dataset.social_skype || '""'),
+                    social_linkedin: JSON.parse(row.dataset.social_linkedin || '""'),
+                    message_to_students: JSON.parse(row.dataset.message_to_students || '""'),
+                    message_to_staff: JSON.parse(row.dataset.message_to_staff || '""')
+                };
+
+                // set form action + simple inputs
+                const editForm = document.getElementById('messagesEditForm');
+                editForm.action = `/admin/principal-message/edit/${message.id}`;
+                document.getElementById('messagesEditId').value = message.id;
+                document.getElementById('messagesEditFacebook').value = message.social_facebook || '';
+                document.getElementById('messagesEditTwitter').value = message.social_twitter || '';
+                document.getElementById('messagesEditSkype').value = message.social_skype || '';
+                document.getElementById('messagesEditLinkedin').value = message.social_linkedin || '';
+                document.getElementById('messagesEditExistingImage').value = message.image || '';
+
+                // image preview
+                const imgContainer = document.getElementById('messagesCurrentImageContainer');
+                imgContainer.innerHTML = '';
+                if (message.image) {
+                    imgContainer.innerHTML = `<div class="messages-current-image">
+                                <img src="${message.image}" alt="Current image" style="max-width:150px;max-height:150px;">
+                                <p class="messages-current-image-text">Current Image</p>
+                              </div>`;
+                }
+
+                // Show modal first so editor can initialize correctly, then init editors and set data
+                const modal = document.getElementById('messagesEditModal');
+                modal.style.display = 'block';
+
+                initEditEditors().then(() => {
+                    try {
+                        if (editEditors.name) editEditors.name.setData(message.name || '');
+                        if (editEditors.role) editEditors.role.setData(message.role || '');
+                        if (editEditors.students) editEditors.students.setData(message.message_to_students || '');
+                        if (editEditors.staff) editEditors.staff.setData(message.message_to_staff || '');
+                    } catch (err) {
+                        console.error('Error setting edit editor data', err);
+                    }
+                });
+            }
+
+            /* Close edit modal */
+            function closeMessagesEditModal() {
+                document.getElementById('messagesEditModal').style.display = 'none';
+            }
+
+            /* Close modal when clicking outside */
+            window.addEventListener('click', function (event) {
+                const modal = document.getElementById('messagesEditModal');
+                if (event.target === modal) closeMessagesEditModal();
+            });
+
+            /* Sync editor contents into textareas before submitting Add form */
+            /* Sync editor contents into textareas before submitting Add form */
+
+            /* Helper: push editor data into original textarea */
+            function syncEditors(editorsMap) {
+                for (const key in editorsMap) {
+                    if (editorsMap[key]) {
+                        const editor = editorsMap[key];
+                        const textarea = editor.sourceElement;
+                        const data = editor.getData();
+                        textarea.value = data;
+                        console.log(`Synced editor "${textarea.id}" →`, data); // Debug log
+                    }
+                }
+            }
+
+            const addForm = document.getElementById('messagesForm');
+            if (addForm) {
+                addForm.addEventListener('submit', function (e) {
+                    console.log('Submitting Add Form...');
+                    syncEditors(addEditors);
+                });
+            }
+
+            const editForm = document.getElementById('messagesEditForm');
+            if (editForm) {
+                editForm.addEventListener('submit', function (e) {
+                    console.log('Submitting Edit Form...');
+                    syncEditors(editEditors);
+                });
+            }
+
+
+
+            /* Optional: If Add form is initially visible, init editors */
+            document.addEventListener('DOMContentLoaded', () => {
+                // if your add form is visible on page load, initialize now:
+                const addFormEl = document.getElementById('messagesAddForm');
+                if (addFormEl && getComputedStyle(addFormEl).display !== 'none') {
+                    initAddEditors();
+                }
+            });
+        </script>
+
+
+        <style>
+            /* Messages Section Styles */
+            .messages-section {
+                margin-top: 30px;
+            }
+
+            .sai {
+                padding: 30px important;
+            }
+
+            .messages-header {
+                margin-bottom: 20px;
+            }
+
+            .messages-title {
+                color: #2d3748;
+                font-size: 1.5rem;
+                font-weight: 600;
+            }
+
+
+            .ck.ck-editor__main>.ck-editor__editable {
+                border-color: var(--ck-color-base-border);
+                padding: 0px 30px !important;
+            }
+
+            .messages-form-card {
+                background: white;
+                border-radius: 10px;
+                overflow: visible;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .messages-card-body {
+                padding: 20px;
+            }
+
+            .messages-form-label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: #374151;
+            }
+
+            .messages-form-control {
+                display: block;
+                width: 100%;
+                padding: 10px 12px;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 1.5;
+                color: #374151;
+                background-color: #fff;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
+
+            .messages-form-control:focus {
+                border-color: #3b82f6;
+                outline: 0;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+
+            .messages-form-text {
+                display: block;
+                margin-top: 4px;
+                font-size: 12px;
+                color: #6b7280;
+            }
+
+            .messages-form-footer {
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid #e5e7eb;
+            }
+
+            .messages-table-responsive {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .messages-data-table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .messages-data-table th {
+                background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                color: white;
+                padding: 15px;
+                text-align: left;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-size: 14px;
+            }
+
+            .messages-data-table td {
+                padding: 15px;
+                border-bottom: 1px solid #e5e7eb;
+                vertical-align: middle;
+            }
+
+            .messages-table-row:hover {
+                background: #f9fafb !important;
+            }
+
+            .messages-table-image {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 50%;
+                border: 2px solid #e5e7eb;
+            }
+
+            .messages-table-image-placeholder {
+                width: 60px;
+                height: 60px;
+                background: #f3f4f6;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #9ca3af;
+            }
+
+            .messages-table-name {
+                font-weight: 500;
+                color: #1f2937;
+            }
+
+            .messages-table-role {
+                color: #4b5563;
+            }
+
+            .messages-social-links {
+                display: flex;
+                gap: 10px;
+            }
+
+            .messages-social-link {
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background: #f3f4f6;
+                transition: all 0.3s ease;
+                text-decoration: none;
+            }
+
+            .messages-social-link:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .messages-social-facebook {
+                color: #3b5998;
+            }
+
+            .messages-social-twitter {
+                color: #1da1f2;
+            }
+
+            .messages-social-skype {
+                color: #00aff0;
+            }
+
+            .messages-social-linkedin {
+                color: #0077b5;
+            }
+
+            .messages-actions {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .messages-no-data {
+                padding: 40px;
+                text-align: center;
+                color: #6b7280;
+            }
+
+            .messages-no-data i {
+                font-size: 48px;
+                color: #d1d5db;
+                margin-bottom: 15px;
+                display: block;
+            }
+
+            /* Modal Styles */
+            .messages-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+            }
+
+            .messages-modal-content {
+                background: white;
+                margin: 5% auto;
+                padding: 0;
+                width: 80%;
+                max-width: 800px;
+                border-radius: 12px;
+                overflow: hidden;
+                max-height: 90vh;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            .messages-modal-header {
+                background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                color: white;
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .messages-modal-title {
+                margin: 0;
+                font-size: 1.25rem;
+            }
+
+            .messages-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .messages-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                max-height: 60vh;
+                flex-grow: 1;
+            }
+
+            .messages-modal-footer {
+                padding: 20px;
+                background: #f9fafb;
+                border-top: 1px solid #e5e7eb;
+            }
+
+            .messages-current-image {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            .messages-current-image img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 2px solid #e5e7eb;
+            }
+
+            .messages-current-image-text {
+                font-size: 12px;
+                color: #6b7280;
+                margin-top: 5px;
+            }
+
+            .ck-editor {
+                min-height: 200px;
+                width: 100%;
+            }
+
+
+            @keyframes messagesModalFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-50px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .messages-modal-content {
+                animation: messagesModalFadeIn 0.3s ease;
+            }
+        </style>
+
+        <%- include('../layouts/admin_layouts_footer') %>
