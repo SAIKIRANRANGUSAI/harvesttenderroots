@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<section class="yoga-section">
+
+    <!-- breadcrumb-area-start -->
+    <div class="it-breadcrumb-area it-breadcrumb-bg" style="background-image: url(/images/breadcrumb-img.png); background-size: cover; background-position: center center; background-repeat: no-repeat;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="it-breadcrumb-content z-index-3 text-center">
+                        <div class="it-breadcrumb-title-box">
+                            <h3 class="it-breadcrumb-title"><%= facilityData.facility_name %></h3>
+                        </div>
+                        <div class="it-breadcrumb-list-wrap">
+                            <div class="it-breadcrumb-list">
+                                <span><a href="/">home</a></span>
+                                <span class="dvdr">//</span>
+                                <span><%= facilityData.facility_name %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- breadcrumb-area-end -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="yoga-content">
+                    <!-- <h2><%= facilityData.facility_name %> at Harvest Tender Roots School</h2> -->
+                    <%- facilityData.description %> <!-- CKEditor content -->
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="yoga-sliders">
+                    <div id="carouselExampleAutoplaying" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <% sliderImages.forEach((img, index) => { %>
+                                <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                    <img src="<%= img %>" class="d-block w-100 img-fluid" alt="<%= facilityData.facility_name %>">
+                                </div>
+                            <% }) %>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<%- include('partials/footer') %>

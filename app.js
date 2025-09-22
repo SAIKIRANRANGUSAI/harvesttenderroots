@@ -6,6 +6,7 @@ const mysql = require("mysql2/promise"); // Using mysql2 with async/await
 const cookieParser = require("cookie-parser");
 
 const app = express();
+const fetchMenuFacilities = require('./middleware/fetchMenuFacilities'); // correct relative path
 
 // -------------------- MIDDLEWARE -------------------- //
 
@@ -25,13 +26,18 @@ app.set("views", [
   path.join(__dirname, "views"),       // frontend views
   path.join(__dirname, "admin/views")  // admin views
 ]);
-
+app.use(fetchMenuFacilities);
 // -------------------- ROUTES -------------------- //
 const frontendRoutes = require("./routes/frontend");
 const adminRoutes = require("./routes/admin");
 
 app.use("/", frontendRoutes);       // all public pages
 app.use("/admin", adminRoutes);     // all admin panel pages
+
+
+// Apply middleware globally
+
+
 
 // -------------------- START SERVER -------------------- //
 if (require.main === module) {
@@ -40,5 +46,6 @@ if (require.main === module) {
     console.log(`🚀 Server running at http://localhost:${PORT}`)
   );
 }
+
 
 module.exports = app; // Export for serverless / testing

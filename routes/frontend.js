@@ -14,6 +14,8 @@ const he = require("he");
 // });
 
 
+
+
 // Home page
 router.get("/", async (req, res) => {
   try {
@@ -235,4 +237,38 @@ router.get("/blog-view/:eventSlug", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+router.get("/:facilitySlug", async (req, res, next) => {
+  try {
+    const facilitySlug = req.params.facilitySlug.toLowerCase();
+
+    // Fetch all facilities
+    const [facilityRows] = await db.execute("SELECT * FROM facilities");
+
+    // Find the matching facility
+    const facilityData = facilityRows.find(f => 
+      f.facility_name.toLowerCase().replace(/ /g, '-') === facilitySlug
+    );
+
+    if (!facilityData) return next(); // go to next route if not found
+
+    const sliderImages = [
+      facilityData.image1,
+      facilityData.image2,
+      facilityData.image3,
+      facilityData.image4,
+      facilityData.image5
+    ].filter(Boolean);
+
+    res.render("frontend/facilities-view", {
+      facilityData,
+      sliderImages
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading facility page");
+  }
+});
+
 module.exports = router;

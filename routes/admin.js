@@ -1113,4 +1113,101 @@ const image5 = newImages[4] || facility.image5 || null;
   }
 });
 
+// ----- GET: All Facilities -----
+router.get("/Facilities", async (req, res) => {
+  try {
+    const [manufacilities] = await db.execute("SELECT * FROM facilities ORDER BY id DESC");
+    res.render("admin/admin_Facilities", { manufacilities, errorMsg: null });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching facilities");
+  }
+});
+
+
+// ----- POST: Add Facility -----
+router.post("/Facilities/add", upload.array("images", 5), async (req, res) => {
+  try {
+    const { facility_name, description } = req.body;
+
+    if (req.files.length > 5) {
+      const [manufacilities] = await db.execute("SELECT * FROM facilities ORDER BY id DESC");
+      return res.render("admin/admin_Facilities", { manufacilities, errorMsg: "You can upload max 5 images only." });
+    }
+
+    const images = [];
+    for (const file of req.files) {
+      const result = await cloudinary.uploader.upload(file.path, { folder: "harvesttenderroots/Facilities" });
+      images.push(result.secure_url);
+      fs.unlinkSync(file.path);
+    }
+
+    const [image1, image2, image3, image4, image5] = [
+      images[0] || null,
+      images[1] || null,
+      images[2] || null,
+      images[3] || null,
+      images[4] || null
+    ];
+
+    await db.execute(
+      `INSERT INTO facilities (facility_name, description, image1, image2, image3, image4, image5) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [facility_name, description, image1, image2, image3, image4, image5]
+    );
+
+    res.redirect("/admin/Facilities");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error saving Facility");
+  }
+});
+
+// ----- GET: Delete Facility -----
+router.get("/Facilities/delete/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await db.execute("DELETE FROM facilities WHERE id = ?", [id]);
+    res.redirect("/admin/Facilities");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting Facility");
+  }
+});
+
+// ----- POST: Edit Facility -----
+router.post("/Facilities/edit/:id", upload.array("images", 5), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { facility_name, description } = req.body;
+
+    const [rows] = await db.execute("SELECT * FROM facilities WHERE id = ?", [id]);
+    if (!rows[0]) return res.redirect("/admin/Facilities");
+    const facility = rows[0];
+
+    const newImages = [];
+    for (const file of req.files) {
+      const result = await cloudinary.uploader.upload(file.path, { folder: "harvesttenderroots/Facilities" });
+      newImages.push(result.secure_url);
+      fs.unlinkSync(file.path);
+    }
+
+    const image1 = newImages[0] || facility.image1 || null;
+    const image2 = newImages[1] || facility.image2 || null;
+    const image3 = newImages[2] || facility.image3 || null;
+    const image4 = newImages[3] || facility.image4 || null;
+    const image5 = newImages[4] || facility.image5 || null;
+
+    await db.execute(
+      `UPDATE facilities SET facility_name=?, description=?, image1=?, image2=?, image3=?, image4=?, image5=? WHERE id=?`,
+      [facility_name, description, image1, image2, image3, image4, image5, id]
+    );
+
+    res.redirect("/admin/Facilities");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error updating Facility");
+  }
+});
+
+
 module.exports = router;
