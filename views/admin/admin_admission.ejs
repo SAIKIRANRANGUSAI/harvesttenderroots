@@ -1,75 +1,300 @@
-<%- include('../layouts/admin_layouts_header', { title: 'Admin | Admission Section', currentPage: 'admission' }) %>
-<%- include('../layouts/admin_layouts_sidebar', { currentPage: 'admission' }) %>
+<%- include('../layouts/admin_layouts_header', { title: 'Admin | Admission Section' , currentPage: 'admission' }) %>
+    <%- include('../layouts/admin_layouts_sidebar', { currentPage: 'admission' }) %>
 
-<style>
-    .sai {
-        padding: 10px 30px !important;
-    }
+        <style>
+            .sai {
+                padding: 10px 30px !important;
+            }
 
-    .ck.ck-editor__main>.ck-editor__editable {
-    border-color: var(--ck-color-base-border);
-    padding: 10px 30px;
-}
-</style>
+            .ck.ck-editor__main>.ck-editor__editable {
+                border-color: var(--ck-color-base-border);
+                padding: 10px 30px;
+            }
+        </style>
 
 
 
-<div class="main-content">
-    <div class="content">
-        <div class="page-header">
-            <h1 class="page-title">Admission Section</h1>
-        </div>
-
-        <div class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">Manage Admission Content</h2>
-            </div>
-
-            <form action="/admin/admission/update" method="POST" enctype="multipart/form-data">
-                <!-- Content Field -->
-                <div class="form-group ">
-                    <label class="form-label">Content</label>
-                    <textarea name="content" id="admissionContent" class="form-input sai " rows="10"><%= admission?.content || '' %></textarea>
+        <div class="main-content">
+            <div class="content">
+                <div class="page-header">
+                    <h1 class="page-title">Admission Section</h1>
                 </div>
 
-                <!-- Image Upload -->
-                <div class="form-group">
-                    <label class="form-label">Image</label>
-                    
-                    <% if (admission && admission.image) { %>
-                        <div style="margin-bottom: 10px; text-align: center;">
-                            <p style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Current Image:</p>
-                            <img src="<%= admission.image %>" alt="Current Image" 
-                                style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Manage Admission Content</h2>
+                    </div>
+
+                    <form action="/admin/admission/update" method="POST" enctype="multipart/form-data">
+                        <!-- Content Field -->
+                        <div class="form-group ">
+                            <label class="form-label">Content</label>
+                            <textarea name="content" id="admissionContent" class="form-input sai "
+                                rows="10"><%= admission_info?.content || '' %></textarea>
                         </div>
-                        <input type="hidden" name="currentImage" value="<%= admission.image %>">
-                    <% } %>
-                    
-                    <input type="file" name="image" class="form-input" accept="image/*">
-                    <small class="text-muted">Upload a new image to replace the current one</small>
-                </div>
 
-                <!-- Submit Button -->
-                <div class="form-footers">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
+                        <!-- Image Upload -->
+                        <div class="form-group">
+                            <label class="form-label">Image</label>
+
+                            <% if (admission_info && admission_info.image) { %>
+                                <div style="margin-bottom: 10px; text-align: center;">
+                                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Current Image:
+                                    </p>
+                                    <img src="<%= admission_info.image %>" alt="Current Image"
+                                        style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                </div>
+                                <input type="hidden" name="currentImage" value="<%= admission_info.image %>">
+                                <% } %>
+
+                                    <input type="file" name="image" class="form-input" accept="image/*">
+                                    <small class="text-muted">Upload a new image to replace the current one</small>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-footers">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
+
+        <!-- CKEditor 4.25.1 LTS (Latest Free Version) -->
+        <!-- CKEditor 5 CDN -->
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                ClassicEditor
+                    .create(document.querySelector('#admissionContent'))
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        </script>
+
+        <div class="main-content">
+  <div class="content">
+    <div class="page-header">
+      <h1 class="page-title">Admission Fee Management</h1>
     </div>
+
+    <div class="content-section">
+      <div class="section-header">
+        <h2 class="section-title">Manage Admission Fees</h2>
+        <button class="btn btn-primary" onclick="openAdmissionModal()">
+          <i class="fas fa-plus"></i> Add New
+        </button>
+      </div>
+
+      <div class="table-wrap" id="no-more-tables">
+        <table class="table table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th>S.No</th>
+              <th>Class</th>
+              <th>New Admission Fee</th>
+              <th>Term I</th>
+              <th>Term II</th>
+              <th>Term III</th>
+              <th>Term IV</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (admissions_fee.length > 0) { %>
+              <% admissions_fee.forEach((row, index) => { %>
+                <tr>
+                  <td data-title="S.No" align="center"><%= index + 1 %></td>
+                  <td data-title="Class"><%= row.class_name %></td>
+                  <td data-title="New Admission Fee" class="numeric">₹<%= parseInt(row.admission_fee || 0).toLocaleString('en-IN') %></td>
+                  <td data-title="Term I" class="numeric">₹<%= parseInt(row.term1_fee || 0).toLocaleString('en-IN') %></td>
+                  <td data-title="Term II" class="numeric">₹<%= parseInt(row.term2_fee || 0).toLocaleString('en-IN') %></td>
+                  <td data-title="Term III" class="numeric">₹<%= parseInt(row.term3_fee || 0).toLocaleString('en-IN') %></td>
+                  <td data-title="Term IV" class="numeric">₹<%= parseInt(row.term4_fee || 0).toLocaleString('en-IN') %></td>
+                  <td data-title="Actions">
+                    <button type="button" class="btn btn-sm btn-warning"
+                      onclick='editAdmission(<%- JSON.stringify(row) %>)'>
+                      <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <a href="/admin/admission/delete/<%= row.id %>"
+                      class="btn btn-sm btn-danger"
+                      onclick="return confirm('Are you sure you want to delete this record?')">
+                      <i class="fas fa-trash"></i> Delete
+                    </a>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="8" class="text-center">No data available</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- CKEditor 4.25.1 LTS (Latest Free Version) -->
-<!-- CKEditor 5 CDN -->
-<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<!-- Modal Form -->
+<div class="modal" id="admissionModal" tabindex="-1" style="display:none;">
+  <div class="modal-dialog modal-lg">
+    <form id="admissionForm" method="POST" action="/admin/admission/save">
+      <input type="hidden" name="id" id="admissionId">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Admission Fee Entry</h5>
+          <button type="button" class="modal-close" onclick="closeAdmissionModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Class Selection -->
+          <div class="form-group">
+            <label>Class Name</label>
+            <div class="class-selection-container">
+              <select id="class_name_select" class="form-control" onchange="handleClassSelection()">
+                <option value="">-- Select Class --</option>
+                <option value="NURSERY / LKG">NURSERY / LKG</option>
+                <option value="UKG">UKG</option>
+                <option value="I & II">I & II</option>
+                <option value="III & IV">III & IV</option>
+                <option value="V">V</option>
+                <option value="VI">VI</option>
+                <option value="VII">VII</option>
+                <option value="VIII">VIII</option>
+                <option value="IX">IX</option>
+                <option value="X">X</option>
+                <option value="XI">XI</option>
+                <option value="XII">XII</option>
+                <option value="custom">Other (Custom Input)</option>
+              </select>
+            </div>
+            <div id="custom_class_container" style="display: none; margin-top: 10px;">
+              <input type="text" id="class_name_custom" name="class_name_custom" class="form-control" 
+                     placeholder="Enter custom class name">
+            </div>
+            <input type="hidden" id="class_name_input" name="class_name">
+          </div>
+
+          <div class="form-row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px;">
+            <div class="form-group">
+              <label>New Admission Fee (₹)</label>
+              <input type="number" name="admission_fee" class="form-control" required min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>Term I Fee (₹)</label>
+              <input type="number" name="term1_fee" class="form-control" required min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>Term II Fee (₹)</label>
+              <input type="number" name="term2_fee" class="form-control" required min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>Term III Fee (₹)</label>
+              <input type="number" name="term3_fee" class="form-control" required min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>Term IV Fee (₹)</label>
+              <input type="number" name="term4_fee" class="form-control" required min="0" step="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" onclick="closeAdmissionModal()">Cancel</button>
+          <button type="submit" class="btn btn-success">Save Changes</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        ClassicEditor
-            .create(document.querySelector('#admissionContent'))
-            .catch(error => {
-                console.error(error);
-            });
-    });
+  function handleClassSelection() {
+    const select = document.getElementById('class_name_select');
+    const customContainer = document.getElementById('custom_class_container');
+    const classInput = document.getElementById('class_name_input');
+    
+    if (select.value === 'custom') {
+      customContainer.style.display = 'block';
+      classInput.value = '';
+    } else {
+      customContainer.style.display = 'none';
+      classInput.value = select.value;
+    }
+  }
+
+  function updateClassName() {
+    const select = document.getElementById('class_name_select');
+    const customInput = document.getElementById('class_name_custom');
+    const classInput = document.getElementById('class_name_input');
+    
+    if (select.value === 'custom') {
+      classInput.value = customInput.value;
+    } else {
+      classInput.value = select.value;
+    }
+  }
+
+  function openAdmissionModal() {
+    const form = document.getElementById("admissionForm");
+    form.reset();
+    document.getElementById("admissionId").value = "";
+    document.getElementById("custom_class_container").style.display = "none";
+    document.getElementById("admissionModal").style.display = "block";
+  }
+
+  function editAdmission(data) {
+    const form = document.getElementById("admissionForm");
+    form.reset();
+    document.getElementById("admissionId").value = data.id;
+    
+    // Check if the class name is in our predefined list
+    const predefinedClasses = [
+      "NURSERY / LKG", "UKG", "I & II", "III & IV", 
+      "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"
+    ];
+    
+    const select = document.getElementById("class_name_select");
+    const customContainer = document.getElementById("custom_class_container");
+    const customInput = document.getElementById("class_name_custom");
+    const classInput = document.getElementById("class_name_input");
+    
+    if (predefinedClasses.includes(data.class_name)) {
+      select.value = data.class_name;
+      customContainer.style.display = "none";
+    } else {
+      select.value = "custom";
+      customContainer.style.display = "block";
+      customInput.value = data.class_name;
+    }
+    
+    classInput.value = data.class_name;
+    form.querySelector("input[name='admission_fee']").value = data.admission_fee;
+    form.querySelector("input[name='term1_fee']").value = data.term1_fee;
+    form.querySelector("input[name='term2_fee']").value = data.term2_fee;
+    form.querySelector("input[name='term3_fee']").value = data.term3_fee;
+    form.querySelector("input[name='term4_fee']").value = data.term4_fee;
+    document.getElementById("admissionModal").style.display = "block";
+  }
+
+  function closeAdmissionModal() {
+    document.getElementById("admissionModal").style.display = "none";
+  }
+
+  // Update class name before form submission
+  document.getElementById("admissionForm").addEventListener("submit", function() {
+    updateClassName();
+  });
+
+  // Also update when custom input changes
+  document.getElementById("class_name_custom").addEventListener("input", updateClassName);
 </script>
-<%- include('../layouts/admin_layouts_footer') %>
+
+
+
+        <%- include('../layouts/admin_layouts_footer') %>

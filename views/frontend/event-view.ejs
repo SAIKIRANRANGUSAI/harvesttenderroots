@@ -1,0 +1,67 @@
+<%- include('partials/header') %>
+
+<section class="yoga-section">
+  <!-- breadcrumb -->
+  <div class="it-breadcrumb-area it-breadcrumb-bg" style="background-image: url(/images/breadcrumb-img.png); background-size: cover;">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <div class="it-breadcrumb-title-box">
+            <h3 class="it-breadcrumb-title"><%- eventDetail.event_name %></h3>
+          </div>
+          <div class="it-breadcrumb-list">
+            <span><a href="/">Home</a></span>
+            <span class="dvdr">//</span>
+            <span><%- eventDetail.event_name %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- event detail -->
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="yoga-content">
+          <h2><%- eventDetail.event_name %> at Harvest Tender Roots School</h2>
+          <div style="max-height:400px; overflow-y:auto;">
+            <!-- CKEditor content -->
+            <%- eventDetail.description %>
+          </div>
+          <ul class="mt-3">
+            <% if(eventDetail.start_time && eventDetail.end_time) { %>
+              <li><h5>Time:</h5> <%= eventDetail.start_time %> to <%= eventDetail.end_time %></li><br>
+            <% } %>
+            <% if(eventDetail.location) { %>
+              <li><h5>Location:</h5> <%- eventDetail.location %></li><br>
+            <% } %>
+            <% if(eventDetail.event_date) { %>
+              <li>
+                <h5>Date:</h5> 
+                <%= new Date(eventDetail.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+              </li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="yoga-sliders">
+          <!-- Single box with horizontal scroll -->
+          <div class="event-images-box" style="display:flex; overflow-x:auto; gap:10px; padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <% 
+              const images = [eventDetail.image1, eventDetail.image2, eventDetail.image3, eventDetail.image4, eventDetail.image5].filter(img => img);
+              if(images.length === 0) images.push('/images/default-event.png'); // default image
+              images.forEach(img => { 
+            %>
+              <img src="<%= img %>" style="height:200px; flex-shrink:0; border-radius:6px;" alt="Event Image">
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

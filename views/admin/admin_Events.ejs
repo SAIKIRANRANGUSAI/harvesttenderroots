@@ -1,0 +1,929 @@
+<%- include('../layouts/admin_layouts_header', { title: 'Admin | Events' , currentPage: 'Events' }) %>
+    <%- include('../layouts/admin_layouts_sidebar', { currentPage: 'Events' }) %>
+
+        <div class="main-content">
+            <div class="content">
+                <div class="page-header">
+                    <h1 class="page-title">Events Management</h1>
+                </div>
+
+                <% if (errorMsg) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= errorMsg %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <% } %>
+
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Add New Event</h2>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <form id="addFacilityForm" action="/admin/Events/add" method="POST"
+                                        enctype="multipart/form-data">
+                                        <div class="form-row"
+                                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                                            <div class="form-group">
+                                                <label class="form-label">Event Name *</label>
+                                                <input type="text" id="event_name" name="event_name" class="form-input"
+                                                    required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Title *</label>
+                                                <input type="text" id="title" name="title" class="form-input" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Description</label>
+                                            <textarea id="description" name="description"
+                                                class="form-input ckeditor-field" rows="3"></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Location</label>
+                                            <input type="text" id="location" name="location" class="form-input">
+                                        </div>
+
+
+                                        <div class="form-row"
+                                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                                            <div class="form-group">
+                                                <label class="form-label">Start Time</label>
+                                                <input type="time" name="start_time" class="form-input">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">End Time</label>
+                                                <input type="time" name="end_time" class="form-input">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Event Date</label>
+                                            <input type="date" name="event_date" class="form-input">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Images (up to 5) *</label>
+                                            <input type="file" name="images" multiple class="form-input"
+                                                accept="image/*" required>
+                                            <small class="form-text">Select multiple images by holding Ctrl (Windows) or
+                                                Command (Mac). Maximum 5 images allowed.</small>
+                                        </div>
+
+                                        <div class="form-footer">
+                                            <button type="submit" class="btn btn-primary">Add Events</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="section-header" style="margin-top: 30px;">
+                                <h2 class="section-title">Current Events</h2>
+                                <div class="table-info">
+                                    Showing <%= facilities.length %> facilities
+                                </div>
+                            </div>
+
+                            <div class="table-wrap">
+                                <table class="table table-striped table-hover">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th width="60">S.No</th>
+                                            <th>Event Name</th>
+                                            <th>Title</th>
+                                            <th width="120">Date</th>
+                                            <th>Location</th>
+                                            <th width="120">Images</th>
+                                            <th width="150">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (facilities.length> 0) { %>
+                                            <% facilities.forEach((facility, index)=> { %>
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <%= facilities.length - index %>
+                                                    </td>
+                                                    <td><%- facility.event_name %></td>
+                                                    <td><%- facility.title %></td>
+                                                    <td>
+                                                        <% let eventDate=new Date(facility.event_date); let
+                                                            validDate=!isNaN(eventDate.getTime()); %>
+                                                            <%= validDate ? eventDate.toISOString().slice(0,10) : 'N/A'
+                                                                %>
+                                                    </td>
+                                                    <td><%- facility.location %></td>
+                                                    <td>
+                                                        <div class="image-gallery">
+                                                            <% [facility.image1, facility.image2, facility.image3,
+                                                                facility.image4, facility.image5].forEach(img=> { %>
+                                                                <% if (img) { %>
+                                                                    <img src="<%= img %>" class="small-thumbnail"
+                                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                                        title="View image"
+                                                                        onclick="previewImage('<%= img %>')" />
+                                                                    <% } %>
+                                                                        <% }) %>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <button class="btn btn-sm btn-warning"
+                                                                onclick="openEditModal(<%= facility.id %>)">
+                                                                <i class="fas fa-edit"></i> Edit
+                                                            </button>
+                                                            <a href="/admin/Events/delete/<%= facility.id %>"
+                                                                class="btn btn-sm btn-danger"
+                                                                onclick="return confirm('Are you sure you want to delete this facility?')">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="7" class="text-center py-4">
+                                                                <div class="empty-state">
+                                                                    <i
+                                                                        class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                                                    <h5>No Facilities Found</h5>
+                                                                    <p class="text-muted">Get started by adding your
+                                                                        first facility or event.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Edit Event</h5>
+                        <button type="button" class="btn btn-sm btn-light rounded-circle shadow" data-bs-dismiss="modal"
+                            aria-label="Close">
+                            &times;
+                        </button>
+
+                    </div>
+                    <div class="modal-body">
+                        <form id="editForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" id="edit_id" name="id">
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Event Name *</label>
+                                    <input type="text" id="edit_event_name" name="event_name" class="form-control"
+                                        required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Title *</label>
+                                    <input type="text" id="edit_title" name="title" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea id="edit_description" name="description"
+                                        class="form-control ckeditor-field" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Location</label>
+                                    <input type="text" id="edit_location" name="location" class="form-control">
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Start Time</label>
+                                    <input type="time" name="start_time" id="edit_start_time" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">End Time</label>
+                                    <input type="time" name="end_time" id="edit_end_time" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Event Date</label>
+                                    <input type="date" name="event_date" id="edit_event_date" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Upload New Images (will replace old ones)</label>
+                                    <input type="file" name="images" multiple class="form-control" accept="image/*">
+                                    <small class="form-text text-muted">Select multiple images by holding Ctrl (Windows)
+                                        or Command (Mac). Maximum 5 images allowed.</small>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Current Images</label>
+                                    <div id="currentImages" class="image-gallery mt-2"></div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Facility</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Preview Modal -->
+        <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Image Preview</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="previewImage" src="" class="img-fluid rounded" alt="Preview">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+        <%- include('../layouts/admin_layouts_footer') %>
+
+            <!-- Load CKEditor 5 Classic -->
+            <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+
+            <script>
+                // ========= FACILITIES DATA =========
+                const facilitiesData = {
+  <% facilities.forEach(facility => { %>
+    <%= facility.id %>: {
+      event_name: `<%- facility.event_name ? facility.event_name.replace(/\n/g, '\\n') : '' %>`,
+      title: `<%- facility.title ? facility.title.replace(/\n/g, '\\n') : '' %>`,
+      description: `<%- facility.description ? facility.description.replace(/\n/g, '\\n') : '' %>`,
+      location: `<%- facility.location ? facility.location.replace(/\n/g, '\\n') : '' %>`,
+      start_time: "<%= facility.start_time || '' %>",
+      end_time: "<%= facility.end_time || '' %>",
+      <% let jsEventDate = new Date(facility.event_date);
+         let safeEventDate = !isNaN(jsEventDate.getTime()) ? jsEventDate.toISOString().slice(0, 10) : ''; %>
+      event_date: "<%= safeEventDate %>",
+      images: [
+        "<%= facility.image1 || '' %>",
+        "<%= facility.image2 || '' %>",
+        "<%= facility.image3 || '' %>",
+        "<%= facility.image4 || '' %>",
+        "<%= facility.image5 || '' %>"
+      ].filter(img => img && img !== "null")
+    },
+  <% }) %>
+};
+
+
+                // ========= CKEDITOR TOOLBARS =========
+                const shortToolbar = ['heading', '|', 'bold', 'italic', 'link', '|', 'undo', 'redo'];
+                const longToolbar = ['heading', '|', 'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', 'blockQuote', '|', 'insertTable', 'undo', 'redo'];
+
+                // ========= EDITOR STATE =========
+                let addEditors = {};
+                let editEditors = {};
+                let addInited = false;
+                let editInited = false;
+                let editModalInstance = null;
+
+                // ========= INIT ADD EDITORS =========
+                function initAddEditors() {
+                    if (addInited) return Promise.resolve();
+
+                    return Promise.all([
+                        ClassicEditor.create(document.querySelector('#event_name'), {
+                            toolbar: shortToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            addEditors.event_name = editor;
+                            editor.sourceElement.removeAttribute('required');
+                        }),
+                        ClassicEditor.create(document.querySelector('#title'), {
+                            toolbar: shortToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            addEditors.title = editor;
+                            editor.sourceElement.removeAttribute('required');
+                        }),
+                        ClassicEditor.create(document.querySelector('#description'), {
+                            toolbar: longToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            addEditors.description = editor;
+                        }),
+                        ClassicEditor.create(document.querySelector('#location'), {
+                            toolbar: shortToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            addEditors.location = editor;
+                        })
+                    ]).then(() => { addInited = true; })
+                        .catch(err => console.error('initAddEditors error', err));
+                }
+
+                // ========= INIT EDIT EDITORS =========
+                function initEditEditors() {
+                    if (editInited) return Promise.resolve();
+
+                    return Promise.all([
+                        ClassicEditor.create(document.querySelector('#edit_event_name'), {
+                            toolbar: shortToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            editEditors.event_name = editor;
+                            editor.sourceElement.removeAttribute('required');
+                        }),
+                        ClassicEditor.create(document.querySelector('#edit_title'), {
+                            toolbar: shortToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            editEditors.title = editor;
+                            editor.sourceElement.removeAttribute('required');
+                        }),
+                        ClassicEditor.create(document.querySelector('#edit_description'), {
+                            toolbar: longToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            editEditors.description = editor;
+                        }),
+                        ClassicEditor.create(document.querySelector('#edit_location'), {
+                            toolbar: shortToolbar,
+                            removePlugins: ['Markdown']
+                        }).then(editor => {
+                            editEditors.location = editor;
+                        })
+                    ]).then(() => { editInited = true; })
+                        .catch(err => console.error('initEditEditors error', err));
+                }
+
+                // ========= HELPERS =========
+                function syncEditors(editorsMap) {
+                    for (const key in editorsMap) {
+                        if (editorsMap[key]) {
+                            const editor = editorsMap[key];
+                            const data = editor.getData();
+                            editor.sourceElement.value = data;
+
+                            if (editor.sourceElement.hasAttribute('required') && data.trim() === '') {
+                                editor.sourceElement.setCustomValidity('This field is required');
+                            } else {
+                                editor.sourceElement.setCustomValidity('');
+                            }
+                        }
+                    }
+                }
+
+                function validateFormWithEditors(editorsMap) {
+                    let isValid = true;
+
+                    for (const key in editorsMap) {
+                        if (editorsMap[key]) {
+                            const editor = editorsMap[key];
+                            const data = editor.getData();
+
+                            if (editor.sourceElement.hasAttribute('required') && data.trim() === '') {
+                                isValid = false;
+                                editor.ui.view.editable.element.style.border = '2px solid #dc3545';
+                            } else {
+                                editor.ui.view.editable.element.style.border = '';
+                            }
+                        }
+                    }
+                    return isValid;
+                }
+
+                // ========= ON PAGE LOAD =========
+                document.addEventListener('DOMContentLoaded', function () {
+                    initAddEditors();
+
+                    // Tooltips
+                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+
+                    // Add form submit
+                    const addForm = document.getElementById('addFacilityForm');
+                    if (addForm) {
+                        addForm.addEventListener('submit', function (e) {
+                            syncEditors(addEditors);
+                            if (!validateFormWithEditors(addEditors)) {
+                                e.preventDefault();
+                                alert('Please fill in all required fields');
+                            }
+                        });
+                    }
+
+                    // Edit form submit
+                    const editForm = document.getElementById('editForm');
+                    if (editForm) {
+                        editForm.addEventListener('submit', function (e) {
+                            syncEditors(editEditors);
+                            if (!validateFormWithEditors(editEditors)) {
+                                e.preventDefault();
+                                alert('Please fill in all required fields');
+                            }
+                        });
+                    }
+
+                    // Modal instance
+                    editModalInstance = new bootstrap.Modal(document.getElementById('editModal'));
+                });
+
+                // ========= OPEN EDIT MODAL =========
+                function openEditModal(facilityId) {
+                    const facility = facilitiesData[facilityId];
+                    if (!facility) return;
+
+                    // Set form action + IDs
+                    document.getElementById('editForm').action = `/admin/Events/edit/${facilityId}`;
+                    document.getElementById('edit_id').value = facilityId;
+
+                    // Plain fields
+                    document.getElementById('edit_start_time').value = facility.start_time;
+                    document.getElementById('edit_end_time').value = facility.end_time;
+                    document.getElementById('edit_event_date').value = facility.event_date;
+
+                    // Current images
+                    const imagesContainer = document.getElementById('currentImages');
+                    imagesContainer.innerHTML = '';
+                    facility.images.forEach(img => {
+                        if (img) {
+                            const imgElement = document.createElement('img');
+                            imgElement.src = img;
+                            imgElement.className = 'small-thumbnail me-1 mb-1';
+                            imgElement.style.cursor = 'pointer';
+                            imgElement.onclick = () => previewImage(img);
+                            imagesContainer.appendChild(imgElement);
+                        }
+                    });
+
+                    // Show modal
+                    editModalInstance.show();
+
+                    // Init editors and populate data
+                    initEditEditors().then(() => {
+                        if (editEditors.event_name) editEditors.event_name.setData(facility.event_name || '');
+                        if (editEditors.title) editEditors.title.setData(facility.title || '');
+                        if (editEditors.description) editEditors.description.setData(facility.description || '');
+                        if (editEditors.location) editEditors.location.setData(facility.location || '');
+                    });
+                }
+
+                // ========= PREVIEW IMAGE =========
+                function previewImage(src) {
+                    document.getElementById('previewImage').src = src;
+                    new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+                }
+            </script>
+
+            <style>
+                /* ========= GLOBAL STYLES ========= */
+                .main-content {
+                    padding: 20px;
+                    background-color: #f8f9fa;
+                }
+
+                .content {
+                    max-width: 1400px;
+                    margin: 0 auto;
+                    width: 100%;
+                }
+
+                .page-header {
+                    margin-bottom: 2rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid #e9ecef;
+                }
+
+                .page-title {
+                    color: #2c3e50;
+                    font-weight: 600;
+                    font-size: 1.8rem;
+                    margin: 0;
+                }
+
+                .content-section {
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    padding: 2rem;
+                    margin-bottom: 2rem;
+                }
+
+                .section-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 2rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid #eaeaea;
+                }
+
+                .section-title {
+                    color: #2c3e50;
+                    font-weight: 600;
+                    font-size: 1.4rem;
+                    margin: 0;
+                }
+
+                .table-info {
+                    color: #6c757d;
+                    font-size: 0.9rem;
+                    background: #f8f9fa;
+                    padding: 0.5rem 1rem;
+                    border-radius: 6px;
+                    font-weight: 500;
+                }
+
+                /* ========= CARD STYLES ========= */
+                .card {
+                    border: none;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+                }
+
+                .card-body {
+                    padding: 2rem;
+                }
+
+                /* ========= FORM STYLES ========= */
+                .form-group {
+                    margin-bottom: 1.5rem;
+                }
+
+                .form-label {
+                    font-weight: 600;
+                    color: #2c3e50;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.95rem;
+                }
+
+                .form-input,
+                .form-control {
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid #d1d3e2;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                    font-size: 0.95rem;
+                    background-color: #fff;
+                }
+
+                .form-input:focus,
+                .form-control:focus {
+                    border-color: #4e73df;
+                    outline: none;
+                    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+                    transform: translateY(-1px);
+                }
+
+                .form-text {
+                    color: 6c757d;
+                    font-size: 0.85rem;
+                    margin-top: 0.25rem;
+                    display: block;
+                }
+
+                .form-row {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1.5rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                .form-footer {
+                    margin-top: 2rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid #eaeaea;
+                    text-align: right;
+                }
+
+                /* ========= BUTTON STYLES ========= */
+                .btn {
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    font-size: 0.95rem;
+                    transition: all 0.3s ease;
+                    border: none;
+                }
+
+                .btn-primary {
+                    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                    box-shadow: 0 4px 15px rgba(78, 115, 223, 0.3);
+                }
+
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(78, 115, 223, 0.4);
+                }
+
+                .btn-warning {
+                    background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+                    box-shadow: 0 4px 15px rgba(246, 194, 62, 0.3);
+                }
+
+                .btn-danger {
+                    background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+                    box-shadow: 0 4px 15px rgba(231, 74, 59, 0.3);
+                }
+
+                .btn-sm {
+                    padding: 0.5rem 1rem;
+                    font-size: 0.85rem;
+                }
+
+                .btn-group {
+                    display: flex;
+                    gap: 0.5rem;
+                    flex-wrap: wrap;
+                }
+
+                /* ========= TABLE STYLES ========= */
+                .table-wrap {
+                    overflow-x: auto;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+                    margin-top: 1.5rem;
+                }
+
+                .table {
+                    margin-bottom: 0;
+                    width: 100%;
+                    border-collapse: separate;
+                    border-spacing: 0;
+                }
+
+                .table th {
+                    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                    color: white;
+                    font-weight: 600;
+                    padding: 1rem;
+                    text-align: left;
+                    border: none;
+                    font-size: 0.9rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .table td {
+                    padding: 1rem;
+                    vertical-align: middle;
+                    border-bottom: 1px solid #e9ecef;
+                    font-size: 0.95rem;
+                }
+
+                .table-striped tbody tr:nth-of-type(odd) {
+                    background-color: rgba(78, 115, 223, 0.02);
+                }
+
+                .table-striped tbody tr:hover {
+                    background-color: rgba(78, 115, 223, 0.08);
+                    transform: scale(1.01);
+                    transition: all 0.2s ease;
+                }
+
+                /* ========= IMAGE GALLERY ========= */
+                .image-gallery {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                    align-items: center;
+                }
+
+                .small-thumbnail {
+                    width: 40px;
+                    height: 40px;
+                    object-fit: cover;
+                    border-radius: 6px;
+                    border: 2px solid #fff;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+                }
+
+                .small-thumbnail:hover {
+                    transform: scale(1.2);
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    z-index: 10;
+                    border-color: #4e73df;
+                }
+
+                /* ========= MODAL STYLES ========= */
+                .modal-content {
+                    border-radius: 12px;
+                    border: none;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                }
+
+                .modal-header {
+                    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                    color: white;
+                    border-top-left-radius: 12px;
+                    border-top-right-radius: 12px;
+                    padding: 1.5rem;
+                    border-bottom: none;
+                }
+
+                .modal-title {
+                    font-weight: 600;
+                    font-size: 1.3rem;
+                }
+
+                .modal-body {
+                    padding: 2rem;
+                    max-height: 70vh;
+                    overflow-y: auto;
+                }
+
+                .modal-footer {
+                    border-top: 1px solid #eaeaea;
+                    padding: 1.5rem 2rem;
+                    border-bottom-left-radius: 12px;
+                    border-bottom-right-radius: 12px;
+                }
+
+                /* ========= CKEDITOR STYLES ========= */
+                .ck.ck-editor {
+                    margin-bottom: 1rem;
+                }
+
+                .ck.ck-editor__editable:not(.ck-editor__nested-editable) {
+                    min-height: 120px;
+                    border-radius: 8px;
+                    border: 1px solid #d1d3e2 !important;
+                    padding: 1rem !important;
+                    font-size: 0.95rem;
+                }
+
+                .ck.ck-editor__editable:focus {
+                    border-color: #4e73df !important;
+                    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15) !important;
+                }
+
+                /* ========= EMPTY STATE ========= */
+                .empty-state {
+                    padding: 3rem 2rem;
+                    text-align: center;
+                    color: #6c757d;
+                }
+
+                .empty-state i {
+                    margin-bottom: 1rem;
+                    opacity: 0.5;
+                }
+
+                .empty-state h5 {
+                    margin-bottom: 0.5rem;
+                    color: #495057;
+                    font-weight: 600;
+                }
+
+                /* ========= RESPONSIVE STYLES ========= */
+                @media (max-width: 992px) {
+                    .form-row {
+                        grid-template-columns: 1fr;
+                        gap: 1rem;
+                    }
+
+                    .section-header {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 1rem;
+                    }
+
+                    .btn-group {
+                        flex-direction: column;
+                        width: 100%;
+                    }
+
+                    .btn-group .btn {
+                        width: 100%;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .modal-body {
+                        padding: 1.5rem;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .main-content {
+                        padding: 1rem;
+                    }
+
+                    .content-section {
+                        padding: 1.5rem;
+                    }
+
+                    .card-body {
+                        padding: 1.5rem;
+                    }
+
+                    .page-title {
+                        font-size: 1.5rem;
+                    }
+
+                    .section-title {
+                        font-size: 1.2rem;
+                    }
+
+                    .table th,
+                    .table td {
+                        padding: 0.75rem;
+                        font-size: 0.9rem;
+                    }
+
+                    .image-gallery {
+                        justify-content: center;
+                    }
+                }
+
+                @media (max-width: 576px) {
+                    .modal-dialog {
+                        margin: 0.5rem;
+                    }
+
+                    .modal-body {
+                        padding: 1rem;
+                    }
+
+                    .btn {
+                        padding: 0.6rem 1.2rem;
+                        font-size: 0.9rem;
+                    }
+                }
+
+                /* ========= UTILITY CLASSES ========= */
+                .text-center {
+                    text-align: center;
+                }
+
+                .text-muted {
+                    color: #6c757d !important;
+                }
+
+                .mb-3 {
+                    margin-bottom: 1rem !important;
+                }
+
+                .mt-2 {
+                    margin-top: 0.5rem !important;
+                }
+
+                .me-1 {
+                    margin-right: 0.25rem !important;
+                }
+
+                .mb-1 {
+                    margin-bottom: 0.25rem !important;
+                }
+
+                .py-4 {
+                    padding-top: 1.5rem !important;
+                    padding-bottom: 1.5rem !important;
+                }
+
+                .rounded {
+                    border-radius: 8px !important;
+                }
+
+                .img-fluid {
+                    max-width: 100%;
+                    height: auto;
+                }
+            </style>

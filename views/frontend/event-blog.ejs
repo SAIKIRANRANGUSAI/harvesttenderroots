@@ -1,0 +1,131 @@
+<%- include('partials/header') %>
+
+<% 
+  function format12Hour(timeStr) { 
+    if (!timeStr) return ''; 
+    let [hours, minutes] = timeStr.split(':'); 
+    hours = parseInt(hours); 
+    const ampm = hours >= 12 ? 'PM' : 'AM'; 
+    hours = hours % 12 || 12; 
+    return `${hours}:${minutes} ${ampm}`; 
+  } 
+%>
+
+<div id="event" class="it-event-2-area p-relative pt-90 pb-90">
+  <div class="container">
+    <div class="it-event-2-title-wrap mb-60">
+      <div class="row align-items-end">
+        <div class="col-12">
+          <div class="it-event-2-title-box text-center">
+            <span class="it-section-subtitle-2">Our Events</span>
+            <h2 class="it-section-title-3">All Upcoming Events</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <% if(eventsList && eventsList.length) { %>
+        <% eventsList.forEach(event => { 
+            const dateObj = new Date(event.event_date);
+            const day = dateObj.getDate();
+            const month = dateObj.toLocaleString('default', { month: 'short' });
+            const cleanName = event.event_name.replace(/<[^>]*>?/gm, '').toLowerCase().replace(/ /g, '-');
+        %>
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-30">
+          <div class="it-event-2-item-box">
+            <div class="it-event-2-item d-flex flex-column" style="height:100%;">
+              
+              <!-- Event Thumbnail -->
+              <div class="it-event-2-thumb fix">
+                <a href="/blog-view/<%= cleanName %>">
+                  <img src="<%= event.image1 || '/images/default-event.png' %>" alt="<%- event.event_name %>" />
+                </a>
+                <div class="it-event-2-date">
+                  <span>
+                    <i><%= day %></i> <br />
+                    <%= month %>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Event Content -->
+              <div class="it-event-2-content flex-grow-1 d-flex flex-column">
+                
+                <!-- Scrollable Title -->
+                <h4 class="it-event-2-title scrollable-text">
+                  <a href="/blog-view/<%= cleanName %>"><%- event.event_name %></a>
+                </h4>
+
+                <!-- Scrollable Description -->
+                <div class="it-event-2-text scrollable-text">
+                  <%- event.title %>
+                </div>
+
+                <!-- Time & Location -->
+                <div class="it-event-2-meta mt-auto">
+                  <% if(event.start_time && event.end_time){ %>
+                    <span><i class="fa-light fa-clock"></i> Time: <%= format12Hour(event.start_time) %> to <%= format12Hour(event.end_time) %></span>
+                  <% } %>
+                  <% if(event.location){ %>
+                    <span><i class="fa-light fa-location-dot"></i> Location: <%- event.location %></span>
+                  <% } %>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      <% } else { %>
+        <div class="col-12 text-center">
+          <p>No upcoming events available.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Make all event boxes same height */
+.it-event-2-item-box {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Scrollable title and description */
+.scrollable-text {
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.scrollable-text::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* Limit title height */
+.it-event-2-title.scrollable-text {
+  max-height: 50px; 
+  margin-bottom: 5px;
+}
+
+/* Limit description height */
+.it-event-2-text.scrollable-text {
+  max-height: 70px; 
+  margin-bottom: 5px;
+}
+
+/* Ensure event content grows and pushes meta to bottom */
+.it-event-2-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.it-event-2-meta {
+  margin-top: auto;
+}
+</style>
+
+<%- include('partials/footer') %>

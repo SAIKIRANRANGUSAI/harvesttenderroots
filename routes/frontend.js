@@ -1,6 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
+const he = require("he");
+
+
+// Example: get recent events excluding current
+// const recentEvents = await db.Events.findAll({
+//   where: {
+//     id: { [Op.ne]: eventDetail.id } // exclude current event
+//   },
+//   limit: 5,
+//   order: [['event_date', 'DESC']]
+// });
+
 
 // Home page
 router.get("/", async (req, res) => {
@@ -20,12 +32,24 @@ router.get("/", async (req, res) => {
     // Why Choose Us
     const [whyRows] = await db.query("SELECT * FROM why_choose_us WHERE id = 1");
     const why = whyRows[0] || {};
+    
 
     // Fun Classes
     const [rowsf] = await db.query("SELECT * FROM fun_classes WHERE id = 1");
     const fun = rowsf[0] || {};
+
     const [events] = await db.query("SELECT * FROM beyond_classrooms ORDER BY id ASC");
-     const [funFactsRows] = await db.query("SELECT * FROM fun_facts LIMIT 1");
+    const [eventsList] = await db.query("SELECT * FROM events ORDER BY event_date ASC LIMIT 3");
+
+    // Decode CKEditor content for home page events
+    eventsList.forEach(event => {
+      if(event.title) event.title = he.decode(event.title);
+      if(event.description) event.description = he.decode(event.description);
+      if(event.location) event.location = he.decode(event.location);
+    });
+
+
+    const [funFactsRows] = await db.query("SELECT * FROM fun_facts LIMIT 1");
     const funRow = funFactsRows[0] || {};
     const funFacts = [
       { heading: funRow.heading1, number: funRow.number1, image: funRow.image1 },
@@ -34,7 +58,7 @@ router.get("/", async (req, res) => {
       { heading: funRow.heading4, number: funRow.number4, image: funRow.image4 },
     ];
     // ✅ Render frontend homepage with DB data
-    res.render("frontend/index", { homeContent, values, content, why, fun, events, funFacts });
+    res.render("frontend/index", { homeContent, values, content, why, fun, events, funFacts,eventsList });
   } catch (err) {
     console.error("Frontend home error:", err);
     res.status(500).send("Server error");
@@ -76,7 +100,7 @@ router.get("/alumini", (req, res) => {
   res.render("frontend/alumini");
 });
 
-// Blog View
+
 router.get("/blog-view", (req, res) => {
   res.render("frontend/blog-view");
 });
@@ -87,14 +111,24 @@ router.get("/contact", (req, res) => {
 });
 
 // Dance
-router.get("/dance", (req, res) => {
-  res.render("frontend/dance");
-});
+// router.get("/dance", (req, res) => {
+//   res.render("frontend/dance");
+// });
 
 // Fee Structure
-router.get("/fee-structure", (req, res) => {
-  res.render("frontend/fee-structure");
+router.get("/fee-structure", async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM admissions ORDER BY id ASC");
+
+    res.render("frontend/fee-structure", {
+      admissions_fee: rows
+    });
+  } catch (error) {
+    console.error("Error fetching admissions:", error);
+    res.status(500).send("Error loading fee structure");
+  }
 });
+
 
 // Gallery
 router.get("/gallery", (req, res) => {
@@ -143,10 +177,62 @@ router.get("/staff", (req, res) => {
 router.get("/student-enrollment", (req, res) => {
   res.render("frontend/student-enrollment");
 });
+router.get("/event-blog", async (req, res) => {
+  try {
+    const [eventsList] = await db.query("SELECT * FROM events ORDER BY event_date ASC");
 
-// Yoga
-router.get("/yoga", (req, res) => {
-  res.render("frontend/yoga");
+    // Decode CKEditor content
+    eventsList.forEach(event => {
+      if(event.title) event.title = he.decode(event.title);
+      if(event.description) event.description = he.decode(event.description);
+      if(event.location) event.location = he.decode(event.location);
+    });
+
+    res.render("frontend/event-blog", { eventsList });
+  } catch(err) {
+    console.error("Event blog error:", err);
+    res.status(500).send("Server error");
+  }
 });
 
+// Event detail page
+router.get("/blog-view/:eventSlug", async (req, res) => {
+  try {
+    const eventSlug = req.params.eventSlug; // e.g., "republic-day"
+
+    // Fetch all events
+    const [events] = await db.query("SELECT * FROM events ORDER BY event_date ASC");
+
+    // Find the event matching the slug
+    const eventDetail = events.find(ev => {
+      const sanitizedName = ev.event_name.replace(/<[^>]*>/g, '').toLowerCase().replace(/ /g, '-');
+      return sanitizedName === eventSlug;
+    });
+
+    if (!eventDetail) return res.status(404).send("Event not found");
+
+    // Recent events excluding current
+    const recentEvents = events
+      .filter(ev => ev.id !== eventDetail.id)
+      .sort((a,b) => new Date(b.event_date) - new Date(a.event_date))
+      .slice(0,3);
+
+    // Decode CKEditor content
+    if(eventDetail.title) eventDetail.title = he.decode(eventDetail.title);
+    if(eventDetail.description) eventDetail.description = he.decode(eventDetail.description);
+    if(eventDetail.location) eventDetail.location = he.decode(eventDetail.location);
+
+    recentEvents.forEach(ev => {
+      if(ev.title) ev.title = he.decode(ev.title);
+      if(ev.description) ev.description = he.decode(ev.description);
+      if(ev.location) ev.location = he.decode(ev.location);
+    });
+
+    res.render("frontend/blog-view", { eventDetail, recentEvents });
+
+  } catch(err) {
+    console.error("Event view error:", err);
+    res.status(500).send("Server error");
+  }
+});
 module.exports = router;

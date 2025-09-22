@@ -62,17 +62,17 @@ router.get("/home", isAuthenticated, async (req, res) => {
     const values = rowss;
     const [siteRows] = await db.query("SELECT * FROM site_content LIMIT 1");
     const content = siteRows[0] || {};
-    const [whyRows]  = await db.query("SELECT * FROM why_choose_us WHERE id = 1");
-    const why     = whyRows[0] || {};
+    const [whyRows] = await db.query("SELECT * FROM why_choose_us WHERE id = 1");
+    const why = whyRows[0] || {};
     const [rowsf] = await db.query("SELECT * FROM fun_classes WHERE id = 1");
     const fun = rowsf[0] || {};
     const [slides] = await db.query("SELECT * FROM beyond_classrooms ORDER BY id ASC");
 
     const [rowsx] = await db.query("SELECT * FROM fun_facts LIMIT 1");
     const funFacts = rowsx[0] || {};
-    
-  
-    res.render("admin/admin_home", { homeContent, values, content, why, fun, slides, funFacts});
+
+
+    res.render("admin/admin_home", { homeContent, values, content, why, fun, slides, funFacts });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
@@ -309,25 +309,25 @@ router.post("/site-content/update", isAuthenticated, upload.fields([
         vision_image = ?
     WHERE id = 1
 `, [
-    body.main_heading || '',
-    body.main_description || '',
-    body.homeabout_heading || '',
-    body.homeabout_description || '',
-    home1_image,
-    home2_image,
-    home3_image,
-    body.about_home_heading || '',
-    body.about_home_description || '',
-    about1_image,
-    about2_image,
-    about3_image,
-    body.mission_heading || '',
-    body.mission_description || '',
-    mission_image,
-    body.vision_heading || '',
-    body.vision_description || '',
-    vision_image
-]);
+        body.main_heading || '',
+        body.main_description || '',
+        body.homeabout_heading || '',
+        body.homeabout_description || '',
+        home1_image,
+        home2_image,
+        home3_image,
+        body.about_home_heading || '',
+        body.about_home_description || '',
+        about1_image,
+        about2_image,
+        about3_image,
+        body.mission_heading || '',
+        body.mission_description || '',
+        mission_image,
+        body.vision_heading || '',
+        body.vision_description || '',
+        vision_image
+      ]);
 
 
     }
@@ -361,7 +361,7 @@ router.post("/why-choose-us/update", upload.single("image"), isAuthenticated, as
       });
       image = result.secure_url;
 
-      try { fs.unlinkSync(req.file.path); } 
+      try { fs.unlinkSync(req.file.path); }
       catch (err) { console.warn("Temp file not found, skipping delete:", err.message); }
 
       console.log("Cloudinary URL:", image); // check if URL is coming
@@ -760,7 +760,7 @@ router.post("/beyond-classrooms/update/:id", isAuthenticated, upload.single("ima
   try {
     const { id } = req.params;
     const { title, existing_image } = req.body;
-    
+
     let imageUrl = existing_image || null;
 
     if (req.file) {
@@ -776,7 +776,7 @@ router.post("/beyond-classrooms/update/:id", isAuthenticated, upload.single("ima
           console.error("Cloudinary delete failed:", cloudErr);
         }
       }
-      
+
       // Upload new image
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "harvesttenderroots/beyond-classrooms"
@@ -804,7 +804,7 @@ router.post("/beyond-classrooms/delete/:id", isAuthenticated, async (req, res) =
 
     // Get the slide to delete its image from Cloudinary
     const [rows] = await db.query("SELECT image FROM beyond_classrooms WHERE id = ?", [id]);
-    
+
     if (rows.length && rows[0].image) {
       try {
         const imageUrl = rows[0].image;
@@ -812,7 +812,7 @@ router.post("/beyond-classrooms/delete/:id", isAuthenticated, async (req, res) =
         const fileName = urlParts.pop();
         const folderPath = urlParts.slice(urlParts.indexOf("harvesttenderroots")).join("/");
         const publicId = `${folderPath}/${fileName.split(".")[0]}`;
-        
+
         await cloudinary.uploader.destroy(publicId);
       } catch (cloudErr) {
         console.error("Cloudinary delete failed:", cloudErr);
@@ -897,13 +897,21 @@ router.post(
 // GET admin admission page
 router.get('/admission', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM admission_info LIMIT 1');
-    res.render('admin/admin_admission', { admission: rows[0] || null, currentPage: 'admission' });
+    // Admission info (content + image)
+    const [infoRows] = await db.query('SELECT * FROM admission_info LIMIT 1');
+
+    // Admission fees table
+    const [rows] = await db.query('SELECT * FROM admissions ORDER BY id ASC');
+    res.render('admin/admin_admission', {
+      admission_info: infoRows[0] || null,  // for content & image
+      admissions_fee: rows, currentPage: 'admission'
+    });
   } catch (error) {
-    console.error(error);
-    res.send('Error loading admission page');
+    console.error('Error loading admission page:', error);
+    res.status(500).send('Error loading admission page');
   }
 });
+
 
 // POST: Update admission info
 router.post('/admission/update', upload.single('image'), async (req, res) => {
@@ -948,6 +956,160 @@ router.post('/admission/update', upload.single('image'), async (req, res) => {
   } catch (error) {
     console.error('Error updating admission info:', error);
     res.send('Error updating admission info');
+  }
+});
+
+
+
+// Save Admission Entry
+router.post('/admission/save', async (req, res) => {
+  try {
+    const { id, class_name, admission_fee, term1_fee, term2_fee, term3_fee, term4_fee } = req.body;
+
+    if (id) {
+      // Update
+      await db.query(
+        `UPDATE admissions 
+         SET class_name = ?, admission_fee = ?, term1_fee = ?, term2_fee = ?, term3_fee = ?, term4_fee = ?
+         WHERE id = ?`,
+        [class_name, admission_fee, term1_fee, term2_fee, term3_fee, term4_fee, id]
+      );
+    } else {
+      // Insert
+      await db.query(
+        `INSERT INTO admissions (class_name, admission_fee, term1_fee, term2_fee, term3_fee, term4_fee)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [class_name, admission_fee, term1_fee, term2_fee, term3_fee, term4_fee]
+      );
+    }
+
+    res.redirect('/admin/admission');
+  } catch (err) {
+    console.error("Error saving admission info:", err);
+    res.send("Error saving admission info");
+  }
+});
+
+
+// GET - Delete
+router.get('/admission/delete/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM admissions WHERE id = ?', [id]); // corrected table name
+    res.redirect('/admin/admission');
+  } catch (error) {
+    console.error(error);
+    res.send('Error deleting admission');
+  }
+});
+
+
+router.get("/Events", async (req, res) => {
+  try {
+    const [facilities] = await db.execute("SELECT * FROM events ORDER BY event_date DESC");
+    res.render("admin/admin_Events", { facilities, errorMsg: null });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching Events");
+  }
+});
+
+// ----- POST: Add Facility -----
+router.post("/Events/add", upload.array("images", 5), async (req, res) => {
+  try {
+    const { event_name, title, description, location, start_time, end_time, event_date } = req.body;
+
+    // Check max 5 images
+    if (req.files.length > 5) {
+      const [facilities] = await db.execute("SELECT * FROM events ORDER BY event_date DESC");
+      return res.render("admin/Events", { facilities, errorMsg: "You can upload max 5 images only." });
+    }
+
+    // Upload images to Cloudinary
+    const images = [];
+for (const file of req.files) {
+  const result = await cloudinary.uploader.upload(file.path, {
+    folder: "harvesttenderroots/Events",
+  });
+  images.push(result.secure_url);
+  fs.unlinkSync(file.path);
+}
+
+// Ensure all 5 image slots have a value or null
+const [image1, image2, image3, image4, image5] = [
+  images[0] || null,
+  images[1] || null,
+  images[2] || null,
+  images[3] || null,
+  images[4] || null
+];
+
+    const sql = `
+      INSERT INTO events
+      (event_name, title, description, location, start_time, end_time, event_date, image1, image2, image3, image4, image5)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    await db.execute(sql, [event_name, title, description, location, start_time, end_time, event_date, image1, image2, image3, image4, image5]);
+
+    res.redirect("/admin/Events");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error saving Events");
+  }
+});
+
+// ----- GET: Delete Facility -----
+router.get("/Events/delete/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await db.execute("DELETE FROM events WHERE id = ?", [id]);
+    res.redirect("/admin/Events");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting Events");
+  }
+});
+
+// ----- POST: Edit Facility -----
+router.post("/Events/edit/:id", upload.array("images", 5), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { event_name, title, description, location, start_time, end_time, event_date } = req.body;
+
+    // Fetch current facility
+    const [rows] = await db.execute("SELECT * FROM events WHERE id = ?", [id]);
+    if (!rows[0]) return res.redirect("/admin/Events");
+    const facility = rows[0];
+
+    // Upload new images if provided
+const newImages = [];
+for (const file of req.files) {
+  const result = await cloudinary.uploader.upload(file.path, {
+    folder: "harvesttenderroots/Events",
+  });
+  newImages.push(result.secure_url);
+  fs.unlinkSync(file.path);
+}
+
+// Use new images if provided, else keep old, else null
+const image1 = newImages[0] || facility.image1 || null;
+const image2 = newImages[1] || facility.image2 || null;
+const image3 = newImages[2] || facility.image3 || null;
+const image4 = newImages[3] || facility.image4 || null;
+const image5 = newImages[4] || facility.image5 || null;
+
+
+    const sql = `
+      UPDATE events
+      SET event_name=?, title=?, description=?, location=?, start_time=?, end_time=?, event_date=?, image1=?, image2=?, image3=?, image4=?, image5=?
+      WHERE id=?
+    `;
+    await db.execute(sql, [event_name, title, description, location, start_time, end_time, event_date, image1, image2, image3, image4, image5, id]);
+
+    res.redirect("/admin/Events");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error updating Events");
   }
 });
 
