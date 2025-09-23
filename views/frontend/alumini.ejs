@@ -1,138 +1,183 @@
 <%- include('partials/header') %>
 
-<!-- breadcrumb-area-start -->
-       <div class="it-breadcrumb-area it-breadcrumb-bg" style="background-image: url(assets/img/breadcrumb-img.png); background-size: cover; background-position: center center; background-repeat: no-repeat;">
-           <div class="container">
+    <!-- breadcrumb-area-start -->
+    <div class="it-breadcrumb-area it-breadcrumb-bg"
+        style="background-image: url(/images/breadcrumb-img.png); background-size: cover; background-position: center center; background-repeat: no-repeat;">
+        <div class="container">
             <div class="row ">
                 <div class="col-md-12">
                     <div class="it-breadcrumb-content z-index-3 text-center">
                         <div class="it-breadcrumb-title-box">
-                        <h3 class="it-breadcrumb-title">Alumini</h3>
+                            <h3 class="it-breadcrumb-title">Alumini</h3>
                         </div>
                         <div class="it-breadcrumb-list-wrap">
-                        <div class="it-breadcrumb-list">
-                            <span><a href="index.ejs">home</a></span>
-                            <span class="dvdr">//</span>
-                            <span>Alumini</span>
-                        </div>
+                            <div class="it-breadcrumb-list">
+                                <span><a href="index">home</a></span>
+                                <span class="dvdr">//</span>
+                                <span>Alumini</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
-        <!-- breadcrumb-area-end -->
+    </div>
+    <!-- breadcrumb-area-end -->
 
 
-        <section class="alumini-section">
-            <div class="container">
-                
-                <div class="row justify-content-center">
-                    <div class="col-md-10">
-                        <div class="inner-box-form">
-                            <h4 class="text-center mb-4">Alumni Registration Form</h4>
-                              <form action="">
-                            <div class="row">
-                                <div class="col-md-6">
-                                      <div class="mb-3">
-                                         <input type="text" class="form-control" placeholder="Student Name">
-                                    </div>
-                                </div>
-                                  <div class="col-md-6">
-                                      <div class="mb-3">
-                                         <input type="text" class="form-control" placeholder="Date Birth">
-                                    </div>
-                                </div>
-                                 <div class="col-md-6">
-                                        <label for="exampleInputPassword1" class="form-label">Batch From</label>
-                                      <div class="mb-3">
-                                        <select class="form-select" aria-label="Default select example">
-                                            <option selected>Select Year</option>
-                                            <option value="1">1990</option>
-                                            <option value="2">1991</option>
-                                            <option value="3">1992</option>
-                                              <option value="3">1993</option>
-                                            </select>
-                                    </div>
+   <section class="alumini-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <div class="inner-box-form">
+          <h4 class="text-center mb-4">Alumni Registration Form</h4>
 
-                                </div>
-                                  <div class="col-md-6">
-                                      <label for="exampleInputPassword1" class="form-label">Batch To</label>
-                                      <div class="mb-3">
-                                           <select class="form-select" aria-label="Default select example">
-                                            <option selected>Select Year</option>
-                                            <option value="1">1990</option>
-                                            <option value="2">1991</option>
-                                            <option value="3">1992</option>
-                                              <option value="3">1993</option>
-                                            </select>
-                                    </div>
-                                </div><!--col-md-6-->
-                                 <div class="col-md-6">
-                                      <div class="mb-3">
-                                         <input type="text" class="form-control" placeholder="Email">
-                                    </div>
-                                </div>
-                                  <div class="col-md-6">
-                                      <div class="mb-3">
-                                         <input type="text" class="form-control" placeholder="Mobile No.">
-                                    </div>
-                                </div>
-                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                           <select class="form-select" aria-label="Default select example">
-                                            <option selected>Current Status</option>
-                                            <option value="1">Study</option>
-                                            <option value="2">Job</option>
-                                          
-                                            </select>
-                                    </div>
-                                </div>
-                                  <div class="col-md-6">
-                                      <div class="mb-3">
-                                            <select class="form-select" aria-label="Default select example">
-                                            <option selected>Select Country</option>
-                                            <option value="1">India</option>
-                                            <option value="2">USA</option>
-                                             <option value="2">UK</option>
-                                          
-                                            </select>
-                                    </div>
-                                </div>
+          <% if (successMessage) { %>
+            <div class="alert alert-success"><%= successMessage %></div>
+          <% } %>
 
-                                 <div class="col-md-6">
-                                      <div class="mb-3">
-                                         <input type="text" class="form-control" placeholder="State">
-                                    </div>
-                                </div>
-                                  <div class="col-md-6">
-                                      <div class="mb-3">
-                                         <input type="text" class="form-control" placeholder="City">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                      <textarea class="form-control" placeholder="Address" rows="3"></textarea>
-                                    </div>
-                                </div>
-                                    <div class="col-md-12">
-                                    <div class="mb-3">
-                                      <textarea class="form-control" placeholder="Feelings during your stay at harvest school" rows="3"></textarea>
-                                    </div>
-                                </div>
-                                    <div class="col-md-12">
-                                    <div class="mb-3">
-                                      <textarea class="form-control" placeholder="Suggestions and Feedback " rows="3"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        </div>
-                    </div>
-                </div>
+          <% if (errors && errors.length > 0) { %>
+            <div class="alert alert-danger">
+              <ul>
+                <% errors.forEach(err => { %>
+                  <li><%= err.msg %></li>
+                <% }) %>
+              </ul>
             </div>
-        </section>
+          <% } %>
+
+          <form action="/alumini" method="POST">
+
+            <div class="row">
+
+              <!-- Student Name -->
+              <div class="col-md-6 mb-3">
+                <input type="text" name="student_name" class="form-control" placeholder="Student Name"
+                       value="<%= formData?.student_name || '' %>" required>
+              </div>
+
+              <!-- Date of Birth -->
+              <div class="col-md-6 mb-3">
+                <input type="date" name="date_of_birth" class="form-control" 
+                       value="<%= formData?.date_of_birth || '' %>" required>
+              </div>
+
+              <!-- Batch From -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Batch From</label>
+                <select name="batch_from" class="form-select" required>
+                  <option disabled selected>Select Year</option>
+                  <% const currentYear = new Date().getFullYear(); 
+                     for(let y = 1990; y <= currentYear; y++){ %>
+                     <option value="<%= y %>" <%= formData?.batch_from == y ? 'selected' : '' %>><%= y %></option>
+                  <% } %>
+                </select>
+              </div>
+
+              <!-- Batch To -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Batch To</label>
+                <select name="batch_to" class="form-select" required>
+                  <option disabled selected>Select Year</option>
+                  <% for(let y = 1990; y <= currentYear; y++){ %>
+                     <option value="<%= y %>" <%= formData?.batch_to == y ? 'selected' : '' %>><%= y %></option>
+                  <% } %>
+                </select>
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6 mb-3">
+                <input type="email" name="email" class="form-control" placeholder="Email"
+                       value="<%= formData?.email || '' %>" required>
+              </div>
+
+              <!-- Mobile -->
+              <div class="col-md-6 mb-3">
+                <input type="tel" name="mobile_no" class="form-control" placeholder="Mobile No."
+                       value="<%= formData?.mobile_no || '' %>">
+              </div>
+
+              <!-- Current Status -->
+              <div class="col-md-6 mb-3">
+                <select name="current_status" class="form-select" required>
+                  <option disabled selected>Current Status</option>
+                  <option value="Study" <%= formData?.current_status === 'Study' ? 'selected' : '' %>>Study</option>
+                  <option value="Job" <%= formData?.current_status === 'Job' ? 'selected' : '' %>>Job</option>
+                  <option value="Other" <%= formData?.current_status === 'Other' ? 'selected' : '' %>>Other</option>
+                </select>
+              </div>
+
+              <!-- Country -->
+              <div class="col-md-6 mb-3">
+                <select name="country" class="form-select" required>
+                  <option value="India" <%= formData?.country === 'India' ? 'selected' : '' %>>India</option>
+                  <option value="USA" <%= formData?.country === 'USA' ? 'selected' : '' %>>USA</option>
+                  <option value="UK" <%= formData?.country === 'UK' ? 'selected' : '' %>>UK</option>
+                  <option value="Canada" <%= formData?.country === 'Canada' ? 'selected' : '' %>>Canada</option>
+                  <option value="Australia" <%= formData?.country === 'Australia' ? 'selected' : '' %>>Australia</option>
+                  <option value="Other" <%= formData?.country === 'Other' ? 'selected' : '' %>>Other</option>
+                </select>
+              </div>
+
+              <!-- State -->
+              <div class="col-md-6 mb-3">
+                <input type="text" name="state" class="form-control" placeholder="State"
+                       value="<%= formData?.state || '' %>">
+              </div>
+
+              <!-- City -->
+              <div class="col-md-6 mb-3">
+                <input type="text" name="city" class="form-control" placeholder="City"
+                       value="<%= formData?.city || '' %>">
+              </div>
+
+              <!-- Address -->
+              <div class="col-md-12 mb-3">
+                <textarea name="address" class="form-control" placeholder="Address" rows="3"><%= formData?.address || '' %></textarea>
+              </div>
+
+              <!-- Feelings -->
+              <div class="col-md-12 mb-3">
+                <textarea name="feelings" class="form-control" placeholder="Feelings during your stay at harvest school" rows="3"><%= formData?.feelings || '' %></textarea>
+              </div>
+
+              <!-- Suggestions -->
+              <div class="col-md-12 mb-3">
+                <textarea name="suggestions" class="form-control" placeholder="Suggestions and Feedback" rows="3"><%= formData?.suggestions || '' %></textarea>
+              </div>
+
+              <!-- CAPTCHA -->
+              <div class="col-md-12 mb-3">
+                <div class="g-recaptcha" data-sitekey="6LcOytIrAAAAAEqRPAJyBKke0ivC0t1fY5AXYrpc"></div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="col-12">
+                <button type="submit" class="it-btn">
+                  <span>
+                    Send Message
+                    <svg width="17" height="14" viewBox="0 0 17 14" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 1.24023L16 7.24023L11 13.2402" stroke="currentcolor"
+                            stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M1 7.24023H16" stroke="currentcolor" stroke-width="1.5"
+                            stroke-miterlimit="10" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 
-<%- include('partials/footer') %>
+    <%- include('partials/footer') %>

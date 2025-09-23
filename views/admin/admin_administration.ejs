@@ -3,78 +3,97 @@
 
 <div class="main-content">
     <div class="content">
-        <div class="page-header">
-            <h1 class="page-title">Administration Management</h1>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="header-content">
+                <h1 class="page-title">Administration Management</h1>
+                <p class="page-subtitle">Manage staff members and student enrollment data</p>
+            </div>
+            <div class="header-actions">
+                <div class="date-display">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span id="currentDateTime">Loading...</span>
+                </div>
+            </div>
         </div>
 
         <!-- ✅ Staff Add/Edit Form -->
         <% if (formMode && !enrollmentFormMode) { %>
-            <div class="content-section" style="box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <div class="content-section">
                 <div class="section-header">
-                    <h2 class="section-title">
-                        <%= staffMember ? "Edit Staff Member" : "Add New Staff Member" %>
-                    </h2>
+                    <div class="section-title-container">
+                        <div class="section-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title"><%= staffMember ? "Edit Staff Member" : "Add New Staff Member" %></h2>
+                            <p class="section-subtitle"><%= staffMember ? "Update staff information" : "Add a new staff member to the system" %></p>
+                        </div>
+                    </div>
                 </div>
 
                 <form method="POST"
-                    action="<%= staffMember ? '/admin/administration/staff/edit/' + staffMember.id : '/admin/administration/staff/add' %>">
+                    action="<%= staffMember ? '/admin/administration/staff/edit/' + staffMember.id : '/admin/administration/staff/add' %>"
+                    class="form-container">
 
-                    <div class="form-group">
-                        <label class="form-label">Teacher Name *</label>
-                        <input type="text" name="teacher_name" class="form-input"
-                            value="<%= staffMember ? staffMember.teacher_name : '' %>" required>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Teacher Name *</label>
+                            <input type="text" name="teacher_name" class="form-input"
+                                value="<%= staffMember ? staffMember.teacher_name : '' %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Designation *</label>
+                            <input type="text" name="designation" class="form-input"
+                                value="<%= staffMember ? staffMember.designation : '' %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth *</label>
+                            <input type="date" name="date_of_birth" class="form-input"
+                                value="<%= staffMember ? staffMember.date_of_birth.toISOString().split('T')[0] : '' %>"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Professional Qualification</label>
+                            <input type="text" name="professional_qualification" class="form-input"
+                                value="<%= staffMember ? staffMember.professional_qualification : '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Experience</label>
+                            <input type="text" name="experience" class="form-input"
+                                value="<%= staffMember ? staffMember.experience : '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Trained Status *</label>
+                            <select name="trained_status" class="form-input" required>
+                                <option value="TRAINED" <%= staffMember && staffMember.trained_status === 'TRAINED' ? 'selected' : '' %>>TRAINED</option>
+                                <option value="UNTRAINED" <%= staffMember && staffMember.trained_status === 'UNTRAINED' ? 'selected' : '' %>>UNTRAINED</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">First Appointment</label>
+                            <input type="date" name="first_appointment" class="form-input"
+                                value="<%= staffMember && staffMember.first_appointment ? staffMember.first_appointment.toISOString().split('T')[0] : '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Class Assigned</label>
+                            <input type="text" name="class_assigned" class="form-input"
+                                value="<%= staffMember ? staffMember.class_assigned : '' %>">
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Designation *</label>
-                        <input type="text" name="designation" class="form-input"
-                            value="<%= staffMember ? staffMember.designation : '' %>" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Date of Birth *</label>
-                        <input type="date" name="date_of_birth" class="form-input"
-                            value="<%= staffMember ? staffMember.date_of_birth.toISOString().split('T')[0] : '' %>"
-                            required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Professional Qualification</label>
-                        <input type="text" name="professional_qualification" class="form-input"
-                            value="<%= staffMember ? staffMember.professional_qualification : '' %>">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Experience</label>
-                        <input type="text" name="experience" class="form-input"
-                            value="<%= staffMember ? staffMember.experience : '' %>">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Trained Status *</label>
-                        <select name="trained_status" class="form-input" required>
-                            <option value="TRAINED" <%= staffMember && staffMember.trained_status === 'TRAINED' ? 'selected' : '' %>>TRAINED</option>
-                            <option value="UNTRAINED" <%= staffMember && staffMember.trained_status === 'UNTRAINED' ? 'selected' : '' %>>UNTRAINED</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">First Appointment</label>
-                        <input type="date" name="first_appointment" class="form-input"
-                            value="<%= staffMember && staffMember.first_appointment ? staffMember.first_appointment.toISOString().split('T')[0] : '' %>">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Class Assigned</label>
-                        <input type="text" name="class_assigned" class="form-input"
-                            value="<%= staffMember ? staffMember.class_assigned : '' %>">
-                    </div>
-
-                    <div class="form-footers">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i> Save Changes
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> <%= staffMember ? 'Update Staff Member' : 'Add Staff Member' %>
                         </button>
-                        <a href="/admin/administration" class="btn btn-danger">
+                        <a href="/admin/administration" class="btn btn-secondary">
                             <i class="fas fa-times"></i> Cancel
                         </a>
                     </div>
@@ -84,39 +103,49 @@
 
         <!-- ✅ Enrollment Add/Edit Form -->
         <% if (enrollmentFormMode && !formMode) { %>
-            <div class="content-section" style="box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <div class="content-section">
                 <div class="section-header">
-                    <h2 class="section-title">
-                        <%= currentEnrollment ? "Edit Enrollment" : "Add New Enrollment" %>
-                    </h2>
+                    <div class="section-title-container">
+                        <div class="section-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title"><%= currentEnrollment ? "Edit Enrollment" : "Add New Enrollment" %></h2>
+                            <p class="section-subtitle"><%= currentEnrollment ? "Update enrollment data" : "Add new enrollment information" %></p>
+                        </div>
+                    </div>
                 </div>
 
                 <form method="POST"
-                    action="<%= currentEnrollment ? '/admin/administration/enrollment/edit/' + currentEnrollment.id : '/admin/administration/enrollment/add' %>">
-                    <div class="form-group">
-                        <label class="form-label">Class *</label>
-                        <input type="text" name="class_name" class="form-input"
-                            value="<%= currentEnrollment ? currentEnrollment.class_name : '' %>" required>
+                    action="<%= currentEnrollment ? '/admin/administration/enrollment/edit/' + currentEnrollment.id : '/admin/administration/enrollment/add' %>"
+                    class="form-container">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Class *</label>
+                            <input type="text" name="class_name" class="form-input"
+                                value="<%= currentEnrollment ? currentEnrollment.class_name : '' %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Section</label>
+                            <input type="text" name="section" class="form-input"
+                                value="<%= currentEnrollment ? currentEnrollment.section : '' %>"
+                                placeholder="Optional">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Enrollment Count *</label>
+                            <input type="number" name="enrolment_count" class="form-input" min="0"
+                                value="<%= currentEnrollment ? currentEnrollment.enrolment_count : '' %>" required>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Section</label>
-                        <input type="text" name="section" class="form-input"
-                            value="<%= currentEnrollment ? currentEnrollment.section : '' %>"
-                            placeholder="Optional">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Enrollment Count *</label>
-                        <input type="number" name="enrolment_count" class="form-input" min="0"
-                            value="<%= currentEnrollment ? currentEnrollment.enrolment_count : '' %>" required>
-                    </div>
-
-                    <div class="form-footers">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i> Save Changes
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> <%= currentEnrollment ? 'Update Enrollment' : 'Add Enrollment' %>
                         </button>
-                        <a href="/admin/administration" class="btn btn-danger">
+                        <a href="/admin/administration" class="btn btn-secondary">
                             <i class="fas fa-times"></i> Cancel
                         </a>
                     </div>
@@ -124,23 +153,33 @@
 
                 <!-- Enrollment Image Update Section -->
                 <% if (!currentEnrollment) { %>
-                    <div class="mt-4 pt-4 border-top">
+                    <div class="image-upload-section">
                         <div class="section-header">
-                            <h3 class="section-title">Enrollment Page Image</h3>
+                            <div class="section-title-container">
+                                <div class="section-icon">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div>
+                                    <h3 class="section-title">Enrollment Page Image</h3>
+                                    <p class="section-subtitle">Update the image displayed on the enrollment page</p>
+                                </div>
+                            </div>
                         </div>
-                        <form method="POST" action="/admin/administration/enrollment/image">
-                            <div class="form-group">
-                                <label class="form-label">Image URL</label>
-                                <input type="text" name="image_url" class="form-input"
-                                    value="<%= enrollmentImageData ? enrollmentImageData.image_url : '' %>"
-                                    placeholder="Enter image URL">
+                        <form method="POST" action="/admin/administration/enrollment/image" class="form-container">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Image URL</label>
+                                    <input type="text" name="image_url" class="form-input"
+                                        value="<%= enrollmentImageData ? enrollmentImageData.image_url : '' %>"
+                                        placeholder="Enter image URL">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Alt Text</label>
+                                    <input type="text" name="alt_text" class="form-input"
+                                        value="<%= enrollmentImageData ? enrollmentImageData.alt_text : 'Student Enrollment' %>">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Alt Text</label>
-                                <input type="text" name="alt_text" class="form-input"
-                                    value="<%= enrollmentImageData ? enrollmentImageData.alt_text : 'Student Enrollment' %>">
-                            </div>
-                            <div class="form-footers">
+                            <div class="form-footer">
                                 <button type="submit" class="btn btn-info">
                                     <i class="fas fa-image"></i> Update Image
                                 </button>
@@ -154,19 +193,27 @@
         <!-- ✅ Staff List Table -->
         <div class="content-section">
             <div class="section-header">
-                <h2 class="section-title">All Staff Members</h2>
-                <a href="/admin/administration/staff/add" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add New Staff
-                </a>
+                <div class="section-title-container">
+                    <div class="section-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Staff Members</h2>
+                        <p class="section-subtitle">Manage all teaching and non-teaching staff</p>
+                    </div>
+                </div>
+                <div class="section-actions">
+                    <a href="/admin/administration/staff/add" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New Staff
+                    </a>
+                </div>
             </div>
 
-            <div class="table-wrap table-responsive">
-                <table class="table table-striped" style="width:100%; border-collapse: collapse;">
-                    <caption style="caption-side: top; font-weight: bold; font-size: 1.2rem; color: var(--primary); padding: 10px 0; text-align: center;">
-                        Harvest Public School — Staff Details
-                    </caption>
+            <div class="table-container">
+                <table class="data-table">
                     <thead>
-                        <tr style="background: linear-gradient(135deg, var(--primary), #2c5282); color: white;">
+                        <tr>
+                            <th width="60">SL.No</th>
                             <th>Teacher Name</th>
                             <th>Designation</th>
                             <th>DOB</th>
@@ -175,140 +222,1019 @@
                             <th>Trained</th>
                             <th>First Appointment</th>
                             <th>Class Assigned</th>
-                            <th style="text-align: center;">Actions</th>
+                            <th width="140" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% if (staffList && staffList.length > 0) { %>
                             <% staffList.forEach((row, index) => { %>
-                                <tr style="background: <%= index % 2 === 0 ? '#f8f9fa' : 'white' %>;">
-                                    <td><%= row.teacher_name %></td>
-                                    <td><%= row.designation %></td>
+                                <tr>
+                                    <td class="text-center"><%= index + 1 %></td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <%= row.teacher_name.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div class="user-details">
+                                                <div class="user-name"><%= row.teacher_name %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="designation-badge"><%= row.designation %></span></td>
                                     <td><%= row.date_of_birth.toISOString().split('T')[0] %></td>
-                                    <td><%= row.professional_qualification %></td>
-                                    <td><%= row.experience %></td>
-                                    <td><%= row.trained_status %></td>
+                                    <td><%= row.professional_qualification || '-' %></td>
+                                    <td><%= row.experience || '-' %></td>
+                                    <td>
+                                        <span class="status-badge <%= row.trained_status === 'TRAINED' ? 'status-trained' : 'status-untrained' %>">
+                                            <%= row.trained_status %>
+                                        </span>
+                                    </td>
                                     <td><%= row.first_appointment ? row.first_appointment.toISOString().split('T')[0] : '-' %></td>
                                     <td><%= row.class_assigned || '-' %></td>
-                                    <td style="text-align: center;">
-                                        <a href="/admin/administration/staff/edit/<%= row.id %>" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
-                                        <a href="/admin/administration/staff/delete/<%= row.id %>" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Are you sure you want to delete this staff member?')">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </a>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/admin/administration/staff/edit/<%= row.id %>" class="btn-action edit" 
+                                               data-bs-toggle="tooltip" title="Edit Staff">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="/admin/administration/staff/delete/<%= row.id %>" class="btn-action delete"
+                                               onclick="return confirm('Are you sure you want to delete this staff member?')"
+                                               data-bs-toggle="tooltip" title="Delete Staff">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             <% }) %>
                         <% } else { %>
                             <tr>
-                                <td colspan="9" class="text-center" style="padding: 30px; color: #718096;">
-                                    <i class="fas fa-info-circle" style="font-size: 24px;"></i>
-                                    <br>No staff members found
+                                <td colspan="10" class="text-center">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <h5>No Staff Members</h5>
+                                        <p>No staff members have been added yet.</p>
+                                    </div>
                                 </td>
                             </tr>
                         <% } %>
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination for Staff -->
+            <% if (staffTotalPages > 1) { %>
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        Showing <%= Math.min(staffPerPage, staffList.length) %> of <%= staffTotalCount %> staff members
+                    </div>
+                    <nav class="pagination-nav">
+                        <ul class="pagination">
+                            <li class="page-item <%= staffCurrentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="?staffPage=<%= staffCurrentPage - 1 %>&enrollmentPage=<%= enrollmentCurrentPage %>">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            <% for (let page = 1; page <= staffTotalPages; page++) { %>
+                                <li class="page-item <%= page === staffCurrentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?staffPage=<%= page %>&enrollmentPage=<%= enrollmentCurrentPage %>"><%= page %></a>
+                                </li>
+                            <% } %>
+                            
+                            <li class="page-item <%= staffCurrentPage === staffTotalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="?staffPage=<%= staffCurrentPage + 1 %>&enrollmentPage=<%= enrollmentCurrentPage %>">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            <% } %>
         </div>
 
         <!-- ✅ Enrollment List Table -->
         <div class="content-section">
             <div class="section-header">
-                <h2 class="section-title">Student Enrollment Data</h2>
-                <a href="/admin/administration/enrollment/add" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add New Enrollment
-                </a>
+                <div class="section-title-container">
+                    <div class="section-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Student Enrollment</h2>
+                        <p class="section-subtitle">Manage class-wise enrollment data</p>
+                    </div>
+                </div>
+                <div class="section-actions">
+                    <a href="/admin/administration/enrollment/add" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New Enrollment
+                    </a>
+                </div>
             </div>
 
-            <div class="table-wrap table-responsive">
-                <table class="table table-striped" style="width:100%; border-collapse: collapse;">
-                    <caption style="caption-side: top; font-weight: bold; font-size: 1.2rem; color: var(--primary); padding: 10px 0; text-align: center;">
-                        Student Enrollment Data
-                    </caption>
+            <div class="table-container">
+                <table class="data-table">
                     <thead>
-                        <tr style="background: linear-gradient(135deg, var(--primary), #2c5282); color: white;">
+                        <tr>
+                            <th width="60">SL.No</th>
                             <th>Class</th>
                             <th>Section</th>
                             <th>Enrollment Count</th>
-                            <th style="text-align: center;">Actions</th>
+                            <th width="140" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% if (enrollmentList && enrollmentList.length > 0) { %>
                             <% enrollmentList.forEach((enrollRow, enrollIndex) => { %>
-                                <tr style="background: <%= enrollIndex % 2 === 0 ? '#f8f9fa' : 'white' %>;">
-                                    <td><strong><%= enrollRow.class_name %></strong></td>
+                                <tr>
+                                    <td class="text-center"><%= enrollIndex + 1 %></td>
+                                    <td>
+                                        <div class="class-info">
+                                            <div class="class-name"><%= enrollRow.class_name %></div>
+                                        </div>
+                                    </td>
                                     <td><%= enrollRow.section || 'N/A' %></td>
                                     <td>
-                                        <span class="badge bg-primary" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                        <span class="enrollment-count">
+                                            <i class="fas fa-users me-1"></i>
                                             <%= enrollRow.enrolment_count %> Students
                                         </span>
                                     </td>
-                                    <td style="text-align: center;">
-                                        <a href="/admin/administration/enrollment/edit/<%= enrollRow.id %>" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
-                                        <a href="/admin/administration/enrollment/delete/<%= enrollRow.id %>" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Are you sure you want to delete this enrollment record?')">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </a>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/admin/administration/enrollment/edit/<%= enrollRow.id %>" class="btn-action edit"
+                                               data-bs-toggle="tooltip" title="Edit Enrollment">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="/admin/administration/enrollment/delete/<%= enrollRow.id %>" class="btn-action delete"
+                                               onclick="return confirm('Are you sure you want to delete this enrollment record?')"
+                                               data-bs-toggle="tooltip" title="Delete Enrollment">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             <% }) %>
                         <% } else { %>
                             <tr>
-                                <td colspan="4" class="text-center" style="padding: 30px; color: #718096;">
-                                    <i class="fas fa-info-circle" style="font-size: 24px;"></i>
-                                    <br>No enrollment data found
+                                <td colspan="5" class="text-center">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <i class="fas fa-graduation-cap"></i>
+                                        </div>
+                                        <h5>No Enrollment Data</h5>
+                                        <p>No enrollment records have been added yet.</p>
+                                    </div>
                                 </td>
                             </tr>
                         <% } %>
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- ✅ Enrollment Page Image Section -->
-<div class="content-section">
-    <div class="section-header">
-        <h2 class="section-title">Enrollment Page Image</h2>
-    </div>
-
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h4>Current Image:</h4>
-            <% if (enrollmentImageData) { %>
-                <img src="<%= enrollmentImageData.image_url %>" alt="<%= enrollmentImageData.alt_text %>" 
-                     style="max-width:100%; border: 1px solid #ddd; padding:5px; border-radius:4px;">
-            <% } else { %>
-                <p>No image uploaded yet</p>
+            <!-- Pagination for Enrollment -->
+            <% if (enrollmentTotalPages > 1) { %>
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        Showing <%= Math.min(enrollmentPerPage, enrollmentList.length) %> of <%= enrollmentTotalCount %> enrollment records
+                    </div>
+                    <nav class="pagination-nav">
+                        <ul class="pagination">
+                            <li class="page-item <%= enrollmentCurrentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="?staffPage=<%= staffCurrentPage %>&enrollmentPage=<%= enrollmentCurrentPage - 1 %>">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            <% for (let page = 1; page <= enrollmentTotalPages; page++) { %>
+                                <li class="page-item <%= page === enrollmentCurrentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?staffPage=<%= staffCurrentPage %>&enrollmentPage=<%= page %>"><%= page %></a>
+                                </li>
+                            <% } %>
+                            
+                            <li class="page-item <%= enrollmentCurrentPage === enrollmentTotalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="?staffPage=<%= staffCurrentPage %>&enrollmentPage=<%= enrollmentCurrentPage + 1 %>">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             <% } %>
         </div>
-        <div class="col-md-6">
-            <h4>Update Image:</h4>
-            <form method="POST" action="/admin/administration/enrollment/image" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label class="form-label">Upload Image</label>
-                    <input type="file" name="image_file" class="form-input" accept="image/*" required>
+
+        <!-- ✅ Enrollment Page Image Section -->
+        <div class="content-section">
+            <div class="section-header">
+                <div class="section-title-container">
+                    <div class="section-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Enrollment Page Image</h2>
+                        <p class="section-subtitle">Manage the image displayed on the enrollment page</p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Alt Text</label>
-                    <input type="text" name="alt_text" class="form-input"
-                           value="<%= enrollmentImageData ? enrollmentImageData.alt_text : 'Student Enrollment' %>">
+            </div>
+
+            <div class="image-management">
+                <div class="current-image">
+                    <h4>Current Image</h4>
+                    <% if (enrollmentImageData) { %>
+                        <div class="image-preview">
+                            <img src="<%= enrollmentImageData.image_url %>" alt="<%= enrollmentImageData.alt_text %>">
+                            <div class="image-info">
+                                <p><strong>Alt Text:</strong> <%= enrollmentImageData.alt_text %></p>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="no-image">
+                            <i class="fas fa-image fa-3x"></i>
+                            <p>No image uploaded yet</p>
+                        </div>
+                    <% } %>
                 </div>
-                <div class="form-footers">
-                    <button type="submit" class="btn btn-info">
-                        <i class="fas fa-image"></i> Update Image
-                    </button>
+                
+                <div class="image-upload">
+                    <h4>Update Image</h4>
+                    <form method="POST" action="/admin/administration/enrollment/image" enctype="multipart/form-data" class="upload-form">
+                        <div class="form-group">
+                            <label class="form-label">Upload Image</label>
+                            <input type="file" name="image_file" class="form-input" accept="image/*" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Alt Text</label>
+                            <input type="text" name="alt_text" class="form-input"
+                                   value="<%= enrollmentImageData ? enrollmentImageData.alt_text : 'Student Enrollment' %>">
+                        </div>
+                        <div class="form-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Update Image
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Professional Modals -->
+<!-- View Staff Modal -->
+<div class="modal fade" id="viewStaffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Staff Member Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="staffDetails">
+                <!-- Staff details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Enrollment Modal -->
+<div class="modal fade" id="viewEnrollmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enrollment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="enrollmentDetails">
+                <!-- Enrollment details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Update current date and time
+    function updateDateTime() {
+        const now = new Date();
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
+    }
+    
+    // Update time immediately and then every second
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // Tooltip initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+    });
+
+    // View Staff Details (if you implement this functionality)
+    function viewStaff(staffId) {
+        fetch(`/admin/administration/staff/${staffId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const staff = data.staff;
+                    const detailsHtml = `
+                        <div class="modal-details">
+                            <div class="detail-item">
+                                <label>Teacher Name:</label>
+                                <div class="detail-value">${staff.teacher_name}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Designation:</label>
+                                <div class="detail-value">${staff.designation}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Date of Birth:</label>
+                                <div class="detail-value">${new Date(staff.date_of_birth).toLocaleDateString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Professional Qualification:</label>
+                                <div class="detail-value">${staff.professional_qualification || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Experience:</label>
+                                <div class="detail-value">${staff.experience || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Trained Status:</label>
+                                <div class="detail-value">
+                                    <span class="status-badge ${staff.trained_status === 'TRAINED' ? 'status-trained' : 'status-untrained'}">
+                                        ${staff.trained_status}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <label>First Appointment:</label>
+                                <div class="detail-value">${staff.first_appointment ? new Date(staff.first_appointment).toLocaleDateString() : 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Class Assigned:</label>
+                                <div class="detail-value">${staff.class_assigned || 'N/A'}</div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('staffDetails').innerHTML = detailsHtml;
+                    new bootstrap.Modal(document.getElementById('viewStaffModal')).show();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching staff:', error);
+                alert('Error loading staff details');
+            });
+    }
+
+    // View Enrollment Details (if you implement this functionality)
+    function viewEnrollment(enrollmentId) {
+        fetch(`/admin/administration/enrollment/${enrollmentId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const enrollment = data.enrollment;
+                    const detailsHtml = `
+                        <div class="modal-details">
+                            <div class="detail-item">
+                                <label>Class:</label>
+                                <div class="detail-value">${enrollment.class_name}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Section:</label>
+                                <div class="detail-value">${enrollment.section || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Enrollment Count:</label>
+                                <div class="detail-value">
+                                    <span class="enrollment-count-large">
+                                        <i class="fas fa-users me-2"></i>
+                                        ${enrollment.enrolment_count} Students
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Created Date:</label>
+                                <div class="detail-value">${new Date(enrollment.created_at).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('enrollmentDetails').innerHTML = detailsHtml;
+                    new bootstrap.Modal(document.getElementById('viewEnrollmentModal')).show();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching enrollment:', error);
+                alert('Error loading enrollment details');
+            });
+    }
+</script>
+
+<style>
+    /* ========= DASHBOARD STYLES ========= */
+    .main-content {
+        padding: 30px;
+        background-color: #f8fafc;
+        min-height: 100vh;
+    }
+    
+    .content {
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    /* Dashboard Header */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .page-title {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 2rem;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    .page-subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .header-actions {
+        display: flex;
+        align-items: center;
+    }
+    
+    .date-display {
+        background: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        font-weight: 500;
+        color: #475569;
+    }
+    
+    /* Content Sections */
+    .content-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .section-title-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #475569;
+        font-size: 1.2rem;
+    }
+    
+    .section-title {
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 1.3rem;
+        margin: 0;
+    }
+    
+    .section-subtitle {
+        color: #64748b;
+        margin: 0.25rem 0 0 0;
+        font-size: 0.9rem;
+    }
+    
+    .section-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    /* Form Styles */
+    .form-container {
+        padding: 1.5rem;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-input {
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-footer {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f1f5f9;
+    }
+    
+    .image-upload-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    /* Table Styles */
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+    }
+    
+    .data-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+    
+    .data-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    /* User Info in Tables */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #4f46e5;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .user-details {
+        line-height: 1.3;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .designation-badge {
+        background: #e0e7ff;
+        color: #3730a3;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .class-info .class-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .enrollment-count {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .enrollment-count-large {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    /* Status Badges */
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-trained {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-untrained {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    
+    .btn-action.edit {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+    
+    .btn-action.edit:hover {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-action.delete {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+    
+    .btn-action.delete:hover {
+        background: #ef4444;
+        color: white;
+    }
+    
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #f1f5f9;
+    }
+    
+    .pagination-info {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    
+    .pagination {
+        margin: 0;
+    }
+    
+    .page-link {
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .page-item.active .page-link {
+        background: #4f46e5;
+        border-color: #4f46e5;
+        color: white;
+    }
+    
+    .page-link:hover {
+        color: #4f46e5;
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-state h5 {
+        margin-bottom: 0.5rem;
+        color: #475569;
+        font-weight: 600;
+    }
+    
+    /* Image Management */
+    .image-management {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        padding: 1.5rem;
+    }
+    
+    .current-image, .image-upload {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .image-preview {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .image-preview img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 4px;
+    }
+    
+    .image-info {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .no-image {
+        text-align: center;
+        padding: 2rem;
+        color: #94a3b8;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+    }
+    
+    .upload-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.5rem;
+    }
+    
+    .modal-title {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #e2e8f0;
+        padding: 1rem 1.5rem;
+    }
+    
+    /* Modal Details */
+    .modal-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .detail-item label {
+        width: 200px;
+        font-weight: 600;
+        color: #475569;
+        flex-shrink: 0;
+    }
+    
+    .detail-item .detail-value {
+        flex: 1;
+        color: #1e293b;
+    }
+    
+    /* Button Styles */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background: #4f46e5;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #4338ca;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #374151;
+        color: white;
+    }
+    
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+    }
+    
+    .btn-info:hover {
+        background: #0891b2;
+        color: white;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .image-management {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+        
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .section-title-container {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .section-icon {
+            align-self: flex-start;
+        }
+        
+        .pagination-container {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .detail-item {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .detail-item label {
+            width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .form-footer {
+            flex-direction: column;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .user-info {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+    }
+</style>
 
 <%- include('../layouts/admin_layouts_footer') %>

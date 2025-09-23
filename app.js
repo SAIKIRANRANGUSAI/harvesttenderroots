@@ -7,6 +7,15 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 const fetchMenuFacilities = require('./middleware/fetchMenuFacilities'); // correct relative path
+// const session = require('express-session');
+const flash = require('connect-flash');
+
+app.use(session({
+  secret: 'yoursecretkey',
+  resave: false,
+  saveUninitialized: true
+}));
+app.use(flash());
 
 // -------------------- MIDDLEWARE -------------------- //
 

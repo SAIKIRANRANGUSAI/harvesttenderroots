@@ -37,13 +37,99 @@ router.get("/logout", (req, res) => {
   res.redirect("/admin/login");
 });
 
-// ✅ Dashboard (protected)
-router.get("/dashboard", isAuthenticated, (req, res) => {
-  res.render("admin/admin_dashboard", {
-    title: "Admin Dashboard | Harvest Tender Roots",
-    currentPage: "dashboard",
-    user: req.user // decoded JWT
-  });
+router.get("/dashboard", async (req, res) => {
+  try {
+    const contactPerPage = 10;
+    const alumniPerPage = 10;
+
+    const contactCurrentPage = parseInt(req.query.contactPage, 10) || 1;
+    const alumniCurrentPage = parseInt(req.query.alumniPage, 10) || 1;
+
+    const contactOffset = (contactCurrentPage - 1) * contactPerPage;
+    const alumniOffset = (alumniCurrentPage - 1) * alumniPerPage;
+
+    // Total counts
+    const [[contactCount]] = await db.execute("SELECT COUNT(*) as total FROM contact_messages");
+    const [[alumniCount]] = await db.execute("SELECT COUNT(*) as total FROM alumni");
+
+    // Paginated queries (interpolated)
+    const [contactMessages] = await db.execute(
+      `SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT ${contactPerPage} OFFSET ${contactOffset}`
+    );
+
+    const [alumniRegistrations] = await db.execute(
+      `SELECT * FROM alumni ORDER BY created_at DESC LIMIT ${alumniPerPage} OFFSET ${alumniOffset}`
+    );
+
+    res.render("admin/admin_dashboard", {
+      contactMessages,
+      alumniRegistrations,
+      contactStats: { totalMessages: contactCount.total },
+      alumniStats: { totalAlumni: alumniCount.total },
+      contactCurrentPage,
+      alumniCurrentPage,
+      contactTotalPages: Math.ceil(contactCount.total / contactPerPage),
+      alumniTotalPages: Math.ceil(alumniCount.total / alumniPerPage),
+      contactPerPage,
+      alumniPerPage
+    });
+  } catch (error) {
+    console.error("Error loading dashboard:", error);
+    res.status(500).send("Error loading dashboard");
+  }
+});
+// Get single contact message (for modal)
+router.get("/dashboard/contact-message/:id", async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT * FROM contact_messages WHERE id = ?", [req.params.id]);
+
+    if (rows.length === 0) {
+      return res.json({ success: false, message: "Message not found" });
+    }
+
+    res.json({ success: true, message: rows[0] });
+  } catch (error) {
+    console.error("Error fetching contact message:", error);
+    res.json({ success: false, message: "Error fetching message" });
+  }
+});
+
+// Get single alumni (for modal)
+router.get("/dashboard/alumni/:id", async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT * FROM alumni WHERE id = ?", [req.params.id]);
+
+    if (rows.length === 0) {
+      return res.json({ success: false, message: "Alumni not found" });
+    }
+
+    res.json({ success: true, alumni: rows[0] });
+  } catch (error) {
+    console.error("Error fetching alumni:", error);
+    res.json({ success: false, message: "Error fetching alumni" });
+  }
+});
+
+// Delete contact message
+router.delete("/dashboard/contact-message/delete/:id", async (req, res) => {
+  try {
+    await db.execute("DELETE FROM contact_messages WHERE id = ?", [req.params.id]);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting contact message:", error);
+    res.json({ success: false, message: "Error deleting message" });
+  }
+});
+
+// Delete alumni
+router.delete("/dashboard/alumni/delete/:id", async (req, res) => {
+  try {
+    await db.execute("DELETE FROM alumni WHERE id = ?", [req.params.id]);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting alumni:", error);
+    res.json({ success: false, message: "Error deleting alumni" });
+  }
 });
 
 
@@ -1027,22 +1113,22 @@ router.post("/Events/add", upload.array("images", 5), async (req, res) => {
 
     // Upload images to Cloudinary
     const images = [];
-for (const file of req.files) {
-  const result = await cloudinary.uploader.upload(file.path, {
-    folder: "harvesttenderroots/Events",
-  });
-  images.push(result.secure_url);
-  fs.unlinkSync(file.path);
-}
+    for (const file of req.files) {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: "harvesttenderroots/Events",
+      });
+      images.push(result.secure_url);
+      fs.unlinkSync(file.path);
+    }
 
-// Ensure all 5 image slots have a value or null
-const [image1, image2, image3, image4, image5] = [
-  images[0] || null,
-  images[1] || null,
-  images[2] || null,
-  images[3] || null,
-  images[4] || null
-];
+    // Ensure all 5 image slots have a value or null
+    const [image1, image2, image3, image4, image5] = [
+      images[0] || null,
+      images[1] || null,
+      images[2] || null,
+      images[3] || null,
+      images[4] || null
+    ];
 
     const sql = `
       INSERT INTO events
@@ -1082,21 +1168,21 @@ router.post("/Events/edit/:id", upload.array("images", 5), async (req, res) => {
     const facility = rows[0];
 
     // Upload new images if provided
-const newImages = [];
-for (const file of req.files) {
-  const result = await cloudinary.uploader.upload(file.path, {
-    folder: "harvesttenderroots/Events",
-  });
-  newImages.push(result.secure_url);
-  fs.unlinkSync(file.path);
-}
+    const newImages = [];
+    for (const file of req.files) {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: "harvesttenderroots/Events",
+      });
+      newImages.push(result.secure_url);
+      fs.unlinkSync(file.path);
+    }
 
-// Use new images if provided, else keep old, else null
-const image1 = newImages[0] || facility.image1 || null;
-const image2 = newImages[1] || facility.image2 || null;
-const image3 = newImages[2] || facility.image3 || null;
-const image4 = newImages[3] || facility.image4 || null;
-const image5 = newImages[4] || facility.image5 || null;
+    // Use new images if provided, else keep old, else null
+    const image1 = newImages[0] || facility.image1 || null;
+    const image2 = newImages[1] || facility.image2 || null;
+    const image3 = newImages[2] || facility.image3 || null;
+    const image4 = newImages[3] || facility.image4 || null;
+    const image5 = newImages[4] || facility.image5 || null;
 
 
     const sql = `
@@ -1419,8 +1505,8 @@ router.get("/administration", async (req, res) => {
     const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
     const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
     const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
-    
-    
+
+
     res.render("admin/admin_administration", {
       staffList: staff,
       enrollmentList: enrollments,
@@ -1443,7 +1529,7 @@ router.get("/administration/staff/add", async (req, res) => {
   try {
     const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
     const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
-    
+
     res.render("admin/admin_administration", {
       staffList: staff,
       enrollmentList: enrollments,
@@ -1671,7 +1757,7 @@ router.post("/administration/enrollment/edit/:id", async (req, res) => {
 router.get("/administration/enrollment/delete/:id", async (req, res) => {
   try {
     const enrollmentId = req.params.id;
-    
+
     // Check if enrollment exists
     const [enrollmentRows] = await db.execute("SELECT * FROM student_enrollment WHERE id = ?", [enrollmentId]);
     if (enrollmentRows.length === 0) {
