@@ -1,0 +1,314 @@
+<%- include('../layouts/admin_layouts_header', { title: 'Admin | Staff Management' , currentPage: 'administration' }) %>
+<%- include('../layouts/admin_layouts_sidebar', { currentPage: 'administration' }) %>
+
+<div class="main-content">
+    <div class="content">
+        <div class="page-header">
+            <h1 class="page-title">Administration Management</h1>
+        </div>
+
+        <!-- ✅ Staff Add/Edit Form -->
+        <% if (formMode && !enrollmentFormMode) { %>
+            <div class="content-section" style="box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <%= staffMember ? "Edit Staff Member" : "Add New Staff Member" %>
+                    </h2>
+                </div>
+
+                <form method="POST"
+                    action="<%= staffMember ? '/admin/administration/staff/edit/' + staffMember.id : '/admin/administration/staff/add' %>">
+
+                    <div class="form-group">
+                        <label class="form-label">Teacher Name *</label>
+                        <input type="text" name="teacher_name" class="form-input"
+                            value="<%= staffMember ? staffMember.teacher_name : '' %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Designation *</label>
+                        <input type="text" name="designation" class="form-input"
+                            value="<%= staffMember ? staffMember.designation : '' %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth *</label>
+                        <input type="date" name="date_of_birth" class="form-input"
+                            value="<%= staffMember ? staffMember.date_of_birth.toISOString().split('T')[0] : '' %>"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Professional Qualification</label>
+                        <input type="text" name="professional_qualification" class="form-input"
+                            value="<%= staffMember ? staffMember.professional_qualification : '' %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Experience</label>
+                        <input type="text" name="experience" class="form-input"
+                            value="<%= staffMember ? staffMember.experience : '' %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Trained Status *</label>
+                        <select name="trained_status" class="form-input" required>
+                            <option value="TRAINED" <%= staffMember && staffMember.trained_status === 'TRAINED' ? 'selected' : '' %>>TRAINED</option>
+                            <option value="UNTRAINED" <%= staffMember && staffMember.trained_status === 'UNTRAINED' ? 'selected' : '' %>>UNTRAINED</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">First Appointment</label>
+                        <input type="date" name="first_appointment" class="form-input"
+                            value="<%= staffMember && staffMember.first_appointment ? staffMember.first_appointment.toISOString().split('T')[0] : '' %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Class Assigned</label>
+                        <input type="text" name="class_assigned" class="form-input"
+                            value="<%= staffMember ? staffMember.class_assigned : '' %>">
+                    </div>
+
+                    <div class="form-footers">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="/admin/administration" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        <% } %>
+
+        <!-- ✅ Enrollment Add/Edit Form -->
+        <% if (enrollmentFormMode && !formMode) { %>
+            <div class="content-section" style="box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <%= currentEnrollment ? "Edit Enrollment" : "Add New Enrollment" %>
+                    </h2>
+                </div>
+
+                <form method="POST"
+                    action="<%= currentEnrollment ? '/admin/administration/enrollment/edit/' + currentEnrollment.id : '/admin/administration/enrollment/add' %>">
+                    <div class="form-group">
+                        <label class="form-label">Class *</label>
+                        <input type="text" name="class_name" class="form-input"
+                            value="<%= currentEnrollment ? currentEnrollment.class_name : '' %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Section</label>
+                        <input type="text" name="section" class="form-input"
+                            value="<%= currentEnrollment ? currentEnrollment.section : '' %>"
+                            placeholder="Optional">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Enrollment Count *</label>
+                        <input type="number" name="enrolment_count" class="form-input" min="0"
+                            value="<%= currentEnrollment ? currentEnrollment.enrolment_count : '' %>" required>
+                    </div>
+
+                    <div class="form-footers">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="/admin/administration" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Enrollment Image Update Section -->
+                <% if (!currentEnrollment) { %>
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="section-header">
+                            <h3 class="section-title">Enrollment Page Image</h3>
+                        </div>
+                        <form method="POST" action="/admin/administration/enrollment/image">
+                            <div class="form-group">
+                                <label class="form-label">Image URL</label>
+                                <input type="text" name="image_url" class="form-input"
+                                    value="<%= enrollmentImageData ? enrollmentImageData.image_url : '' %>"
+                                    placeholder="Enter image URL">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Alt Text</label>
+                                <input type="text" name="alt_text" class="form-input"
+                                    value="<%= enrollmentImageData ? enrollmentImageData.alt_text : 'Student Enrollment' %>">
+                            </div>
+                            <div class="form-footers">
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fas fa-image"></i> Update Image
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
+
+        <!-- ✅ Staff List Table -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">All Staff Members</h2>
+                <a href="/admin/administration/staff/add" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Staff
+                </a>
+            </div>
+
+            <div class="table-wrap table-responsive">
+                <table class="table table-striped" style="width:100%; border-collapse: collapse;">
+                    <caption style="caption-side: top; font-weight: bold; font-size: 1.2rem; color: var(--primary); padding: 10px 0; text-align: center;">
+                        Harvest Public School — Staff Details
+                    </caption>
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, var(--primary), #2c5282); color: white;">
+                            <th>Teacher Name</th>
+                            <th>Designation</th>
+                            <th>DOB</th>
+                            <th>Qualification</th>
+                            <th>Experience</th>
+                            <th>Trained</th>
+                            <th>First Appointment</th>
+                            <th>Class Assigned</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (staffList && staffList.length > 0) { %>
+                            <% staffList.forEach((row, index) => { %>
+                                <tr style="background: <%= index % 2 === 0 ? '#f8f9fa' : 'white' %>;">
+                                    <td><%= row.teacher_name %></td>
+                                    <td><%= row.designation %></td>
+                                    <td><%= row.date_of_birth.toISOString().split('T')[0] %></td>
+                                    <td><%= row.professional_qualification %></td>
+                                    <td><%= row.experience %></td>
+                                    <td><%= row.trained_status %></td>
+                                    <td><%= row.first_appointment ? row.first_appointment.toISOString().split('T')[0] : '-' %></td>
+                                    <td><%= row.class_assigned || '-' %></td>
+                                    <td style="text-align: center;">
+                                        <a href="/admin/administration/staff/edit/<%= row.id %>" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="/admin/administration/staff/delete/<%= row.id %>" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this staff member?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="9" class="text-center" style="padding: 30px; color: #718096;">
+                                    <i class="fas fa-info-circle" style="font-size: 24px;"></i>
+                                    <br>No staff members found
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ✅ Enrollment List Table -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">Student Enrollment Data</h2>
+                <a href="/admin/administration/enrollment/add" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Enrollment
+                </a>
+            </div>
+
+            <div class="table-wrap table-responsive">
+                <table class="table table-striped" style="width:100%; border-collapse: collapse;">
+                    <caption style="caption-side: top; font-weight: bold; font-size: 1.2rem; color: var(--primary); padding: 10px 0; text-align: center;">
+                        Student Enrollment Data
+                    </caption>
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, var(--primary), #2c5282); color: white;">
+                            <th>Class</th>
+                            <th>Section</th>
+                            <th>Enrollment Count</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (enrollmentList && enrollmentList.length > 0) { %>
+                            <% enrollmentList.forEach((enrollRow, enrollIndex) => { %>
+                                <tr style="background: <%= enrollIndex % 2 === 0 ? '#f8f9fa' : 'white' %>;">
+                                    <td><strong><%= enrollRow.class_name %></strong></td>
+                                    <td><%= enrollRow.section || 'N/A' %></td>
+                                    <td>
+                                        <span class="badge bg-primary" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                            <%= enrollRow.enrolment_count %> Students
+                                        </span>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <a href="/admin/administration/enrollment/edit/<%= enrollRow.id %>" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="/admin/administration/enrollment/delete/<%= enrollRow.id %>" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this enrollment record?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="4" class="text-center" style="padding: 30px; color: #718096;">
+                                    <i class="fas fa-info-circle" style="font-size: 24px;"></i>
+                                    <br>No enrollment data found
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Enrollment Page Image Section -->
+<div class="content-section">
+    <div class="section-header">
+        <h2 class="section-title">Enrollment Page Image</h2>
+    </div>
+
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h4>Current Image:</h4>
+            <% if (enrollmentImageData) { %>
+                <img src="<%= enrollmentImageData.image_url %>" alt="<%= enrollmentImageData.alt_text %>" 
+                     style="max-width:100%; border: 1px solid #ddd; padding:5px; border-radius:4px;">
+            <% } else { %>
+                <p>No image uploaded yet</p>
+            <% } %>
+        </div>
+        <div class="col-md-6">
+            <h4>Update Image:</h4>
+            <form method="POST" action="/admin/administration/enrollment/image" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Upload Image</label>
+                    <input type="file" name="image_file" class="form-input" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Alt Text</label>
+                    <input type="text" name="alt_text" class="form-input"
+                           value="<%= enrollmentImageData ? enrollmentImageData.alt_text : 'Student Enrollment' %>">
+                </div>
+                <div class="form-footers">
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-image"></i> Update Image
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/admin_layouts_footer') %>

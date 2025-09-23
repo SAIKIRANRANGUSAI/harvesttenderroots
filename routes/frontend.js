@@ -97,25 +97,7 @@ router.get("/admission-procedure", async (req, res) => {
 });
 
 
-// Alumni
-router.get("/alumini", (req, res) => {
-  res.render("frontend/alumini");
-});
 
-
-// router.get("/blog-view", (req, res) => {
-//   res.render("frontend/blog-view");
-// });
-
-// Contact
-router.get("/contact", (req, res) => {
-  res.render("frontend/contact");
-});
-
-// Dance
-// router.get("/dance", (req, res) => {
-//   res.render("frontend/dance");
-// });
 
 // Fee Structure
 router.get("/fee-structure", async (req, res) => {
@@ -161,15 +143,8 @@ router.get("/school-info", async (req, res) => {
 });
 
 
-// Staff
-router.get("/staff", (req, res) => {
-  res.render("frontend/staff");
-});
 
-// Student Enrollment
-router.get("/student-enrollment", (req, res) => {
-  res.render("frontend/student-enrollment");
-});
+
 router.get("/event-blog", async (req, res) => {
   try {
     const [eventsList] = await db.query("SELECT * FROM events ORDER BY event_date ASC");
@@ -291,4 +266,52 @@ router.get('/gallery-view/:category', async (req, res) => {
         res.send('Error fetching gallery');
     }
 });
+
+router.get("/staff", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // items per page
+    const offset = (page - 1) * limit;
+
+    // Total number of staff
+    const [totalRows] = await db.execute("SELECT COUNT(*) AS total FROM staff");
+    const totalItems = totalRows[0].total;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    // Fetch paginated staff data (numbers directly in query)
+    const [staffRows] = await db.query(
+      `SELECT * FROM staff ORDER BY id ASC LIMIT ${limit} OFFSET ${offset}`
+    );
+
+    res.render("frontend/staff", {
+      staffList: staffRows,
+      currentPage: page,
+      totalPages
+    });
+  } catch (err) {
+    console.error("Error fetching staff data:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.get('/student-enrollment', async (req, res) => {
+    try {
+        // Fetch all enrollment data
+        const [enrollmentList] = await db.execute('SELECT * FROM student_enrollment ORDER BY id ASC');
+
+        // Fetch enrollment page image
+        const [imageRows] = await db.execute('SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1');
+        const enrollmentImage = imageRows[0] || null;
+
+        res.render('frontend/student-enrollment', { enrollmentList, enrollmentImage });
+
+    } catch (error) {
+        console.error('Error fetching enrollment data:', error);
+        res.render('frontend/student_enrollment', { enrollmentList: [], enrollmentImage: null });
+    }
+});
+
+
+
+
 module.exports = router;

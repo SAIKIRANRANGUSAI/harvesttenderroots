@@ -1413,5 +1413,319 @@ router.get("/gallery-view/:category", async (req, res) => {
   }
 });
 
+// ✅ Main Administration Page - Show both staff and enrollment
+router.get("/administration", async (req, res) => {
+  try {
+    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
+    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
+    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
+    
+    
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      enrollmentImageData: images.length ? images[0] : null,
+      formMode: false,
+      enrollmentFormMode: false,
+      staffMember: null,
+      currentEnrollment: null
+    });
+  } catch (err) {
+    console.error("Error fetching administration data:", err);
+    res.status(500).send("Error fetching administration data");
+  }
+});
 
+// ========== STAFF ROUTES ==========
+
+// ✅ Show Add Staff form
+router.get("/administration/staff/add", async (req, res) => {
+  try {
+    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
+    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
+    
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      formMode: true,
+      enrollmentFormMode: false,
+      staffMember: null,
+      currentEnrollment: null,
+      enrollmentImageData: null
+    });
+  } catch (err) {
+    console.error("Error loading staff add form:", err);
+    res.status(500).send("Error loading staff add form");
+  }
+});
+
+// ✅ Handle Add Staff
+router.post("/administration/staff/add", async (req, res) => {
+  try {
+    const {
+      teacher_name,
+      designation,
+      date_of_birth,
+      professional_qualification,
+      experience,
+      trained_status,
+      first_appointment,
+      class_assigned
+    } = req.body;
+
+    await db.execute(
+      `INSERT INTO staff 
+      (teacher_name, designation, date_of_birth, professional_qualification, experience, trained_status, first_appointment, class_assigned) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        teacher_name,
+        designation,
+        date_of_birth,
+        professional_qualification,
+        experience,
+        trained_status,
+        first_appointment || null,
+        class_assigned || null
+      ]
+    );
+
+    res.redirect("/admin/administration");
+  } catch (err) {
+    console.error("Error adding staff:", err);
+    res.status(500).send("Error adding staff");
+  }
+});
+
+// ✅ Show Edit Staff form
+router.get("/administration/staff/edit/:id", async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT * FROM staff WHERE id = ?", [req.params.id]);
+
+    if (rows.length === 0) return res.status(404).send("Staff not found");
+
+    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
+    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
+
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      formMode: true,
+      enrollmentFormMode: false,
+      staffMember: rows[0],
+      currentEnrollment: null,
+      enrollmentImageData: null
+    });
+  } catch (err) {
+    console.error("Error loading staff edit form:", err);
+    res.status(500).send("Error loading staff edit form");
+  }
+});
+
+// ✅ Handle Edit Staff
+router.post("/administration/staff/edit/:id", async (req, res) => {
+  try {
+    const {
+      teacher_name,
+      designation,
+      date_of_birth,
+      professional_qualification,
+      experience,
+      trained_status,
+      first_appointment,
+      class_assigned
+    } = req.body;
+
+    await db.execute(
+      `UPDATE staff SET 
+        teacher_name=?, designation=?, date_of_birth=?, professional_qualification=?, 
+        experience=?, trained_status=?, first_appointment=?, class_assigned=? 
+        WHERE id=?`,
+      [
+        teacher_name,
+        designation,
+        date_of_birth,
+        professional_qualification,
+        experience,
+        trained_status,
+        first_appointment || null,
+        class_assigned || null,
+        req.params.id
+      ]
+    );
+
+    res.redirect("/admin/administration");
+  } catch (err) {
+    console.error("Error updating staff:", err);
+    res.status(500).send("Error updating staff");
+  }
+});
+
+// ✅ Delete Staff
+router.get("/administration/staff/delete/:id", async (req, res) => {
+  try {
+    await db.execute("DELETE FROM staff WHERE id = ?", [req.params.id]);
+    res.redirect("/admin/administration");
+  } catch (err) {
+    console.error("Error deleting staff:", err);
+    res.status(500).send("Error deleting staff");
+  }
+});
+
+// ========== ENROLLMENT ROUTES ==========
+
+// ✅ Show Add Enrollment Form
+router.get("/administration/enrollment/add", async (req, res) => {
+  try {
+    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
+    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
+    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
+
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      enrollmentImageData: images.length ? images[0] : null,
+      formMode: false,
+      enrollmentFormMode: true,
+      staffMember: null,
+      currentEnrollment: null
+    });
+  } catch (err) {
+    console.error("Error loading add enrollment form:", err);
+    res.status(500).send("Error loading add enrollment form");
+  }
+});
+
+// ✅ Handle Add Enrollment
+router.post("/administration/enrollment/add", async (req, res) => {
+  try {
+    const { class_name, section, enrolment_count } = req.body;
+
+    // Validation
+    if (!class_name || !enrolment_count) {
+      return res.redirect("/admin/administration/enrollment/add?error=Class name and enrollment count are required");
+    }
+
+    await db.execute(
+      "INSERT INTO student_enrollment (class_name, section, enrolment_count) VALUES (?, ?, ?)",
+      [class_name, section || 'N/A', enrolment_count]
+    );
+
+    res.redirect("/admin/administration");
+  } catch (err) {
+    console.error("Error adding enrollment:", err);
+    res.redirect("/admin/administration/enrollment/add?error=Error adding enrollment");
+  }
+});
+
+// ✅ Show Edit Enrollment Form
+router.get("/administration/enrollment/edit/:id", async (req, res) => {
+  try {
+    const enrollmentId = req.params.id;
+    const [enrollmentRows] = await db.execute("SELECT * FROM student_enrollment WHERE id = ?", [enrollmentId]);
+
+    if (enrollmentRows.length === 0) return res.status(404).send("Enrollment not found");
+
+    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
+    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
+    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
+
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      enrollmentImageData: images.length ? images[0] : null,
+      formMode: false,
+      enrollmentFormMode: true,
+      staffMember: null,
+      currentEnrollment: enrollmentRows[0]
+    });
+  } catch (err) {
+    console.error("Error loading edit enrollment form:", err);
+    res.status(500).send("Error loading edit enrollment form");
+  }
+});
+
+// ✅ Handle Edit Enrollment
+router.post("/administration/enrollment/edit/:id", async (req, res) => {
+  try {
+    const enrollmentId = req.params.id;
+    const { class_name, section, enrolment_count } = req.body;
+
+    // Validation
+    if (!class_name || !enrolment_count) {
+      return res.redirect(`/admin/administration/enrollment/edit/${enrollmentId}?error=Class name and enrollment count are required`);
+    }
+
+    await db.execute(
+      "UPDATE student_enrollment SET class_name = ?, section = ?, enrolment_count = ? WHERE id = ?",
+      [class_name, section || 'N/A', enrolment_count, enrollmentId]
+    );
+
+    res.redirect("/admin/administration");
+  } catch (err) {
+    console.error("Error updating enrollment:", err);
+    res.redirect(`/admin/administration/enrollment/edit/${enrollmentId}?error=Error updating enrollment`);
+  }
+});
+
+// ✅ Delete Enrollment
+router.get("/administration/enrollment/delete/:id", async (req, res) => {
+  try {
+    const enrollmentId = req.params.id;
+    
+    // Check if enrollment exists
+    const [enrollmentRows] = await db.execute("SELECT * FROM student_enrollment WHERE id = ?", [enrollmentId]);
+    if (enrollmentRows.length === 0) {
+      return res.redirect("/admin/administration?error=Enrollment not found");
+    }
+
+    await db.execute("DELETE FROM student_enrollment WHERE id = ?", [enrollmentId]);
+
+    res.redirect("/admin/administration");
+  } catch (err) {
+    console.error("Error deleting enrollment:", err);
+    res.redirect("/admin/administration?error=Error deleting enrollment");
+  }
+});
+
+router.post("/administration/enrollment/image", isAuthenticated, upload.single("image_file"), async (req, res) => {
+  try {
+    const { alt_text } = req.body;
+
+    if (!req.file) {
+      return res.redirect("/admin/administration?error=No file uploaded");
+    }
+
+    // Upload image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "harvesttenderroots/enrollment"
+    });
+
+    // Remove temporary file
+    fs.unlinkSync(req.file.path);
+
+    // Check if an image already exists
+    const [existingImage] = await db.execute(
+      "SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1"
+    );
+
+    if (existingImage.length > 0) {
+      // Update existing image
+      await db.execute(
+        "UPDATE enrollment_images SET image_url = ?, alt_text = ? WHERE id = ?",
+        [result.secure_url, alt_text || "Student Enrollment", existingImage[0].id]
+      );
+    } else {
+      // Insert new image
+      await db.execute(
+        "INSERT INTO enrollment_images (image_url, alt_text) VALUES (?, ?)",
+        [result.secure_url, alt_text || "Student Enrollment"]
+      );
+    }
+
+    res.redirect("/admin/administration");
+  } catch (err) {
+    console.error("Error updating enrollment image:", err);
+    res.redirect("/admin/administration?error=Error updating enrollment image");
+  }
+});
 module.exports = router;
