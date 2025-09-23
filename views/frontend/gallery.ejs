@@ -1,98 +1,68 @@
 <%- include('partials/header') %>
 
 <!-- breadcrumb-area-start -->
-<div class="it-breadcrumb-area it-breadcrumb-bg" style="background-image: url(assets/img/breadcrumb-img.png); background-size: cover; background-position: center center; background-repeat: no-repeat;">
-      
+<div class="it-breadcrumb-area it-breadcrumb-bg" style="background-image: url(/images/breadcrumb-img.png); background-size: cover; background-position: center center; background-repeat: no-repeat;">
     <div class="container">
-    <div class="row ">
-        <div class="col-md-12">
-            <div class="it-breadcrumb-content z-index-3 text-center">
-                <div class="it-breadcrumb-title-box">
-                <h3 class="it-breadcrumb-title">Gallery</h3>
-                </div>
-                <div class="it-breadcrumb-list-wrap">
-                <div class="it-breadcrumb-list">
-                    <span><a href="index.ejs">home</a></span>
-                    <span class="dvdr">//</span>
-                    <span>Gallery</span>
-                </div>
+        <div class="row ">
+            <div class="col-md-12">
+                <div class="it-breadcrumb-content z-index-3 text-center">
+                    <div class="it-breadcrumb-title-box">
+                        <h3 class="it-breadcrumb-title">Gallery</h3>
+                    </div>
+                    <div class="it-breadcrumb-list-wrap">
+                        <div class="it-breadcrumb-list">
+                            <span><a href="/">home</a></span>
+                            <span class="dvdr">//</span>
+                            <span>Gallery</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 </div>
 <!-- breadcrumb-area-end -->
 
+<!-- Inline CSS for uniform cards -->
+<style>
+.gallery-item {
+    display: block;
+    overflow: hidden;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 200px;       /* fixed height for all cards */
+    object-fit: cover;   /* crop image nicely */
+    display: block;
+}
+
+.gallery-item h6 {
+    margin-top: 8px;
+    font-weight: 500;
+    font-size: 16px;
+}
+</style>
+
 <div class="gallery-section">
     <div class="container">
-        <div class="row">
-
-            <div class="gallery-container gallery-grid" >
-                <div class="row">
-                 <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                        href="gallery-view.ejs">
-                        <img src="assets/img/gallery-1.jpg" alt="Mountain View">
-                        <h6>Celebrations</h6>
+        <div class="row gallery-container gallery-grid">
+            <% if (galleries && galleries.length > 0) { %>
+                <% galleries.forEach(gallery => { %>
+                    <div class="col-md-3 mb-3">
+                        <a class="gallery-item" href="/gallery-view/<%= encodeURIComponent(gallery.category) %>">
+                            <img src="<%= gallery.cover_image %>" alt="<%= gallery.category %>">
+                            <h6><%= gallery.category %></h6>
                         </a>
-                </div><!--col-md-3-->
-                <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                         href="gallery-view.ejs">
-                        <img src="assets/img/gallery-6.jpg" alt="Mountain View">
-                        <h6>Childrens Day</h6>
-                        </a>
-                </div><!--col-md-3-->
-                <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                         href="gallery-view.ejs">
-                        <img src="assets/img/gallery-3.jpg" alt="Mountain View">
-                        <h6>Yoga</h6>
-                        </a>
-                </div><!--col-md-3-->
-                <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                          href="gallery-view.ejs">
-                        <img src="assets/img/gallery-4.jpg" alt="Mountain View">
-                        <h6>Anuual Day</h6>
-                        </a>
-                </div><!--col-md-3-->
-                <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                         href="gallery-view.ejs">
-                        <img src="assets/img/gallery-5.jpg" alt="Mountain View">
-                        <h6>Celebrations</h6>
-                        </a>
-                </div><!--col-md-3-->
-                  <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                         href="gallery-view.ejs">
-                        <img src="assets/img/gallery-6.jpg" alt="Mountain View">
-                          <h6>Childrens Day</h6>
-                        </a>
-                </div><!--col-md-3-->
-                 <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                         href="gallery-view.ejs">
-                        <img src="assets/img/gallery-7.jpg" alt="Mountain View">
-                         <h6>Yoga</h6>
-                        </a>
-                </div><!--col-md-3-->
-                 <div class="col-md-3 mb-3">
-                    <a class="gallery-item"
-                         href="gallery-view.ejs">
-                        <img src="assets/img/gallery-8.jpg" alt="Mountain View">
-                          <h6>Anuual Day</h6>
-                        </a>
-                </div><!--col-md-3-->
-                </div>
-            </div>
-        
-          
+                    </div><!--col-md-3-->
+                <% }) %>
+            <% } else { %>
+                <p>No galleries found.</p>
+            <% } %>
         </div>
     </div>
-
 </div>
 
 <%- include('partials/footer') %>

@@ -103,9 +103,9 @@ router.get("/alumini", (req, res) => {
 });
 
 
-router.get("/blog-view", (req, res) => {
-  res.render("frontend/blog-view");
-});
+// router.get("/blog-view", (req, res) => {
+//   res.render("frontend/blog-view");
+// });
 
 // Contact
 router.get("/contact", (req, res) => {
@@ -132,15 +132,6 @@ router.get("/fee-structure", async (req, res) => {
 });
 
 
-// Gallery
-router.get("/gallery", (req, res) => {
-  res.render("frontend/gallery");
-});
-
-// Gallery View
-router.get("/gallery-view", (req, res) => {
-  res.render("frontend/gallery-view");
-});
 
 // Principal Message
 router.get("/principal-message", async (req, res) => {
@@ -270,5 +261,34 @@ router.get("/:facilitySlug", async (req, res, next) => {
     res.status(500).send("Error loading facility page");
   }
 });
+router.get('/gallery', async (req, res) => {
+  try {
+      const [galleries] = await db.execute("SELECT * FROM gallery ORDER BY id DESC");
+      res.render('frontend/gallery', { galleries });
+  } catch (err) {
+      console.error(err);
+      res.render('frontend/gallery', { galleries: [] });
+  }
+});
 
+
+// GET gallery view by category
+router.get('/gallery-view/:category', async (req, res) => {
+    try {
+        const category = req.params.category;
+        const [gallery] = await db.execute("SELECT * FROM gallery WHERE category = ?", [category]);
+
+        if (gallery.length === 0) {
+            return res.send('Gallery not found');
+        }
+
+        // parse images JSON
+        gallery[0].images = JSON.parse(gallery[0].images);
+
+        res.render('frontend/gallery-view', { gallery: gallery[0] });
+    } catch (err) {
+        console.error(err);
+        res.send('Error fetching gallery');
+    }
+});
 module.exports = router;

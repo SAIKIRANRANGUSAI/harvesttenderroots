@@ -1209,5 +1209,209 @@ router.post("/Facilities/edit/:id", upload.array("images", 5), async (req, res) 
   }
 });
 
+// 1️⃣ List all galleries (Admin)
+router.get("/gallery", async (req, res) => {
+  try {
+    const [galleries] = await db.execute("SELECT * FROM gallery ORDER BY id DESC");
+    res.render("admin/admin_gallery", { galleries, errorMsg: req.query.error || null });
+  } catch (err) {
+    console.error("Gallery fetch error:", err);
+    res.render("admin/admin_gallery", { galleries: [], errorMsg: "Failed to load galleries." });
+  }
+});
+
+// 2️⃣ Add a new gallery
+router.post(
+  "/gallery/add",
+  upload.fields([{ name: "cover_image", maxCount: 1 }, { name: "images", maxCount: 10 }]),
+  async (req, res) => {
+    try {
+      const { category } = req.body;
+      if (!category || !req.files["cover_image"]) {
+        return res.redirect("/admin/gallery?error=Category and Cover Image required");
+      }
+
+      // Upload cover image
+      const coverResult = await cloudinary.uploader.upload(req.files["cover_image"][0].path, {
+        folder: "harvesttenderroots/gallery",
+      });
+      const cover_image = coverResult.secure_url;
+      fs.unlinkSync(req.files["cover_image"][0].path);
+
+      // Upload gallery images
+      const images = [];
+      if (req.files["images"]) {
+        for (const file of req.files["images"]) {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: "harvesttenderroots/gallery",
+          });
+          images.push(result.secure_url);
+          fs.unlinkSync(file.path);
+        }
+      }
+
+      await db.execute(
+        "INSERT INTO gallery (category, cover_image, images) VALUES (?, ?, ?)",
+        [category, cover_image, JSON.stringify(images)]
+      );
+
+      res.redirect("/admin/gallery");
+    } catch (err) {
+      console.error("Gallery add error:", err);
+      res.redirect("/admin/gallery?error=Failed to add gallery");
+    }
+  }
+);
+
+// 3️⃣ Edit gallery (category, cover image, add new images)
+router.post(
+  "/gallery/edit/:category",
+  upload.fields([{ name: "cover_image", maxCount: 1 }, { name: "images", maxCount: 10 }]),
+  async (req, res) => {
+    try {
+      const { category } = req.params;
+      const { category_name } = req.body;
+
+      const [rows] = await db.execute("SELECT * FROM gallery WHERE category = ?", [category]);
+      if (!rows[0]) return res.redirect("/admin/gallery?error=Gallery not found");
+
+      const gallery = rows[0];
+
+      // 3a. Update cover image if provided
+      let cover_image = gallery.cover_image;
+      if (req.files?.cover_image?.[0]) {
+        // Delete old cover image from Cloudinary
+        if (gallery.cover_image) {
+          try {
+            const publicId = gallery.cover_image.split("/").pop().split(".")[0];
+            await cloudinary.uploader.destroy(publicId);
+          } catch (err) {
+            console.log("Old cover delete error:", err);
+          }
+        }
+
+        const coverResult = await cloudinary.uploader.upload(req.files.cover_image[0].path, {
+          folder: "harvesttenderroots/gallery",
+        });
+        cover_image = coverResult.secure_url;
+        fs.unlinkSync(req.files.cover_image[0].path);
+      }
+
+      // 3b. Append new gallery images if any
+      let imagesArray = JSON.parse(gallery.images || "[]");
+      if (req.files?.images) {
+        for (const file of req.files.images) {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: "harvesttenderroots/gallery",
+          });
+          imagesArray.push(result.secure_url);
+          fs.unlinkSync(file.path);
+        }
+      }
+
+      // 3c. Update DB
+      await db.execute(
+        "UPDATE gallery SET category = ?, cover_image = ?, images = ? WHERE category = ?",
+        [category_name || category, cover_image, JSON.stringify(imagesArray), category]
+      );
+
+      res.redirect("/admin/gallery");
+    } catch (err) {
+      console.error("Gallery edit error:", err);
+      res.redirect("/admin/gallery?error=Failed to edit gallery: " + err.message);
+    }
+  }
+);
+
+// 4️⃣ Delete gallery by category
+router.post("/gallery/delete/:category", async (req, res) => {
+  try {
+    const { category } = req.params;
+    const [rows] = await db.execute("SELECT * FROM gallery WHERE category = ?", [category]);
+    if (!rows[0]) return res.redirect("/admin/gallery?error=Gallery not found");
+
+    const gallery = rows[0];
+
+    // Delete cover image from Cloudinary
+    if (gallery.cover_image) {
+      const publicId = gallery.cover_image.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // Delete gallery images from Cloudinary
+    const images = JSON.parse(gallery.images || "[]");
+    for (const img of images) {
+      const publicId = img.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // Delete DB row
+    await db.execute("DELETE FROM gallery WHERE category = ?", [category]);
+
+    res.redirect("/admin/gallery");
+  } catch (err) {
+    console.error("Gallery delete error:", err);
+    res.redirect("/admin/gallery?error=Failed to delete gallery");
+  }
+});
+
+// 5️⃣ Delete individual image (cover or gallery)
+router.post("/gallery/delete-image", async (req, res) => {
+  try {
+    const { category, imageUrl, imageType } = req.body;
+    const [rows] = await db.execute("SELECT * FROM gallery WHERE category = ?", [category]);
+    if (!rows[0]) return res.redirect("/admin/gallery?error=Gallery not found");
+
+    const gallery = rows[0];
+
+    // Delete from Cloudinary
+    if (imageUrl) {
+      const publicId = imageUrl.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // Update DB
+    if (imageType === "cover") {
+      await db.execute("UPDATE gallery SET cover_image = NULL WHERE category = ?", [category]);
+    } else if (imageType === "gallery") {
+      let imagesArray = JSON.parse(gallery.images || "[]");
+      imagesArray = imagesArray.filter(img => img !== imageUrl);
+      await db.execute("UPDATE gallery SET images = ? WHERE category = ?", [JSON.stringify(imagesArray), category]);
+    }
+
+    res.redirect("/admin/gallery");
+  } catch (err) {
+    console.error("Image delete error:", err);
+    res.redirect("/admin/gallery?error=Failed to delete image");
+  }
+});
+
+// 6️⃣ Frontend: List galleries
+router.get("/gallery-view", async (req, res) => {
+  try {
+    const [galleries] = await db.execute("SELECT * FROM gallery ORDER BY id DESC");
+    res.render("frontend/gallery", { galleries });
+  } catch (err) {
+    console.error("Frontend gallery error:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// 7️⃣ Frontend: Single gallery view
+router.get("/gallery-view/:category", async (req, res) => {
+  try {
+    const { category } = req.params;
+    const [rows] = await db.execute("SELECT * FROM gallery WHERE category = ?", [category]);
+    if (!rows[0]) return res.status(404).send("Gallery not found");
+
+    const gallery = rows[0];
+    const images = JSON.parse(gallery.images || "[]");
+    res.render("frontend/gallery-view", { gallery, images });
+  } catch (err) {
+    console.error("Single gallery error:", err);
+    res.status(500).send("Server error");
+  }
+});
+
 
 module.exports = router;
