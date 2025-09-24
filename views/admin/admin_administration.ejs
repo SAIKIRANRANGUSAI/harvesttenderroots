@@ -229,7 +229,8 @@
                         <% if (staffList && staffList.length > 0) { %>
                             <% staffList.forEach((row, index) => { %>
                                 <tr>
-                                    <td class="text-center"><%= index + 1 %></td>
+                                   <td class="text-center"><%= staffCurrentPage && staffPerPage ? (staffCurrentPage - 1) * staffPerPage + index + 1 : index + 1 %></td>
+
                                     <td>
                                         <div class="user-info">
                                             <div class="user-avatar">
@@ -241,7 +242,7 @@
                                         </div>
                                     </td>
                                     <td><span class="designation-badge"><%= row.designation %></span></td>
-                                    <td><%= row.date_of_birth.toISOString().split('T')[0] %></td>
+                                    <td><%= row.date_of_birth ? (row.date_of_birth.toISOString ? row.date_of_birth.toISOString().split('T')[0] : row.date_of_birth) : '-' %></td>
                                     <td><%= row.professional_qualification || '-' %></td>
                                     <td><%= row.experience || '-' %></td>
                                     <td>
@@ -249,7 +250,7 @@
                                             <%= row.trained_status %>
                                         </span>
                                     </td>
-                                    <td><%= row.first_appointment ? row.first_appointment.toISOString().split('T')[0] : '-' %></td>
+                                    <td><%= row.first_appointment ? (row.first_appointment.toISOString ? row.first_appointment.toISOString().split('T')[0] : row.first_appointment) : '-' %></td>
                                     <td><%= row.class_assigned || '-' %></td>
                                     <td>
                                         <div class="action-buttons">
@@ -285,33 +286,37 @@
 
             <!-- Pagination for Staff -->
             <% if (staffTotalPages > 1) { %>
-                <div class="pagination-container">
-                    <div class="pagination-info">
-                        Showing <%= Math.min(staffPerPage, staffList.length) %> of <%= staffTotalCount %> staff members
-                    </div>
-                    <nav class="pagination-nav">
-                        <ul class="pagination">
-                            <li class="page-item <%= staffCurrentPage === 1 ? 'disabled' : '' %>">
-                                <a class="page-link" href="?staffPage=<%= staffCurrentPage - 1 %>&enrollmentPage=<%= enrollmentCurrentPage %>">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                            
-                            <% for (let page = 1; page <= staffTotalPages; page++) { %>
-                                <li class="page-item <%= page === staffCurrentPage ? 'active' : '' %>">
-                                    <a class="page-link" href="?staffPage=<%= page %>&enrollmentPage=<%= enrollmentCurrentPage %>"><%= page %></a>
-                                </li>
-                            <% } %>
-                            
-                            <li class="page-item <%= staffCurrentPage === staffTotalPages ? 'disabled' : '' %>">
-                                <a class="page-link" href="?staffPage=<%= staffCurrentPage + 1 %>&enrollmentPage=<%= enrollmentCurrentPage %>">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            <% } %>
+  <div class="pagination-container">
+    <div class="pagination-info">
+      Showing <%= staffList.length %> of <%= staffTotalCount %> staff members
+    </div>
+    <nav class="pagination-nav">
+      <ul class="pagination">
+        <!-- Previous button -->
+        <li class="page-item <%= staffCurrentPage === 1 ? 'disabled' : '' %>">
+          <a class="page-link" href="?staffPage=<%= Math.max(staffCurrentPage - 1, 1) %>&enrollmentPage=<%= enrollmentCurrentPage %>">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+
+        <!-- Page numbers -->
+        <% for (let page = 1; page <= staffTotalPages; page++) { %>
+          <li class="page-item <%= page === staffCurrentPage ? 'active' : '' %>">
+            <a class="page-link" href="?staffPage=<%= page %>&enrollmentPage=<%= enrollmentCurrentPage %>"><%= page %></a>
+          </li>
+        <% } %>
+
+        <!-- Next button -->
+        <li class="page-item <%= staffCurrentPage === staffTotalPages ? 'disabled' : '' %>">
+          <a class="page-link" href="?staffPage=<%= Math.min(staffCurrentPage + 1, staffTotalPages) %>&enrollmentPage=<%= enrollmentCurrentPage %>">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+<% } %>
+
         </div>
 
         <!-- ✅ Enrollment List Table -->
@@ -348,7 +353,8 @@
                         <% if (enrollmentList && enrollmentList.length > 0) { %>
                             <% enrollmentList.forEach((enrollRow, enrollIndex) => { %>
                                 <tr>
-                                    <td class="text-center"><%= enrollIndex + 1 %></td>
+                                    <td class="text-center"><%= enrollmentCurrentPage && enrollmentPerPage ? (enrollmentCurrentPage - 1) * enrollmentPerPage + enrollIndex + 1 : enrollIndex + 1 %></td>
+
                                     <td>
                                         <div class="class-info">
                                             <div class="class-name"><%= enrollRow.class_name %></div>
@@ -967,21 +973,59 @@
     
     /* Pagination */
     .pagination-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        border-top: 1px solid #f1f5f9;
-    }
-    
-    .pagination-info {
-        font-size: 0.9rem;
-        color: #64748b;
-    }
-    
-    .pagination {
-        margin: 0;
-    }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f1f5f9;
+    background-color: #fff;
+}
+
+.pagination-info {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.pagination {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination .page-item {
+    margin: 0 0.25rem;
+}
+
+.pagination .page-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: #3b82f6;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #9ca3af;
+    pointer-events: none;
+    cursor: default;
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.pagination .page-link:hover:not(.disabled):not(.active) {
+    background-color: #e0f2fe;
+    border-color: #3b82f6;
+}
+
     
     .page-link {
         color: #475569;

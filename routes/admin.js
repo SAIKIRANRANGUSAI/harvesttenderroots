@@ -1499,51 +1499,336 @@ router.get("/gallery-view/:category", async (req, res) => {
   }
 });
 
-// ✅ Main Administration Page - Show both staff and enrollment
+// ===== Fixed /administration GET route =====
 router.get("/administration", async (req, res) => {
   try {
-    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
-    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
-    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
+    // ===== Staff Pagination =====
+    let staffCurrentPage = parseInt(req.query.staffPage, 10) || 1;
+    if (isNaN(staffCurrentPage) || staffCurrentPage < 1) staffCurrentPage = 1;
 
+    const staffPerPage = 10;
+    const staffOffset = (staffCurrentPage - 1) * staffPerPage;
+
+    const [staffCountRows] = await db.execute("SELECT COUNT(*) AS count FROM staff");
+    const staffTotalCount = staffCountRows[0].count;
+    const staffTotalPages = Math.ceil(staffTotalCount / staffPerPage);
+
+    // Use numeric values directly in LIMIT/OFFSET
+    const [staff] = await db.execute(
+      `SELECT * FROM staff ORDER BY id ASC LIMIT ${staffPerPage} OFFSET ${staffOffset}`
+    );
+
+    // ===== Enrollment Pagination =====
+    let enrollmentCurrentPage = parseInt(req.query.enrollmentPage, 10) || 1;
+    if (isNaN(enrollmentCurrentPage) || enrollmentCurrentPage < 1) enrollmentCurrentPage = 1;
+
+    const enrollmentPerPage = 10;
+    const enrollmentOffset = (enrollmentCurrentPage - 1) * enrollmentPerPage;
+
+    const [enrollmentCountRows] = await db.execute("SELECT COUNT(*) AS count FROM student_enrollment");
+    const enrollmentTotalCount = enrollmentCountRows[0].count;
+    const enrollmentTotalPages = Math.ceil(enrollmentTotalCount / enrollmentPerPage);
+
+    const [enrollments] = await db.execute(
+      `SELECT * FROM student_enrollment ORDER BY id ASC LIMIT ${enrollmentPerPage} OFFSET ${enrollmentOffset}`
+    );
+
+    // ===== Enrollment Image =====
+    const [images] = await db.execute(
+      "SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1"
+    );
 
     res.render("admin/admin_administration", {
       staffList: staff,
       enrollmentList: enrollments,
+      staffTotalCount,
+      staffTotalPages,
+      staffPerPage,
+      staffCurrentPage,
+      enrollmentTotalCount,
+      enrollmentTotalPages,
+      enrollmentPerPage,
+      enrollmentCurrentPage,
       enrollmentImageData: images.length ? images[0] : null,
       formMode: false,
       enrollmentFormMode: false,
       staffMember: null,
       currentEnrollment: null
     });
+
   } catch (err) {
     console.error("Error fetching administration data:", err);
     res.status(500).send("Error fetching administration data");
   }
 });
 
-// ========== STAFF ROUTES ==========
+// ===== Fix all other routes similarly =====
 
 // ✅ Show Add Staff form
 router.get("/administration/staff/add", async (req, res) => {
   try {
-    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
-    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
+    let staffCurrentPage = parseInt(req.query.staffPage, 10) || 1;
+    if (isNaN(staffCurrentPage) || staffCurrentPage < 1) staffCurrentPage = 1;
+
+    const staffPerPage = 10;
+    const staffOffset = (staffCurrentPage - 1) * staffPerPage;
+
+    const [staffCountRows] = await db.execute("SELECT COUNT(*) AS count FROM staff");
+    const staffTotalCount = staffCountRows[0].count;
+    const staffTotalPages = Math.ceil(staffTotalCount / staffPerPage);
+
+    // Use numeric values directly
+    const [staff] = await db.execute(
+      `SELECT * FROM staff ORDER BY id ASC LIMIT ${staffPerPage} OFFSET ${staffOffset}`
+    );
+
+    // ===== Enrollment data for table =====
+    let enrollmentCurrentPage = parseInt(req.query.enrollmentPage, 10) || 1;
+    if (isNaN(enrollmentCurrentPage) || enrollmentCurrentPage < 1) enrollmentCurrentPage = 1;
+
+    const enrollmentPerPage = 10;
+    const enrollmentOffset = (enrollmentCurrentPage - 1) * enrollmentPerPage;
+
+    const [enrollmentCountRows] = await db.execute("SELECT COUNT(*) AS count FROM student_enrollment");
+    const enrollmentTotalCount = enrollmentCountRows[0].count;
+    const enrollmentTotalPages = Math.ceil(enrollmentTotalCount / enrollmentPerPage);
+
+    const [enrollments] = await db.execute(
+      `SELECT * FROM student_enrollment ORDER BY id ASC LIMIT ${enrollmentPerPage} OFFSET ${enrollmentOffset}`
+    );
+
+    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
 
     res.render("admin/admin_administration", {
       staffList: staff,
       enrollmentList: enrollments,
+      staffTotalCount,
+      staffTotalPages,
+      staffPerPage,
+      staffCurrentPage,
+      enrollmentTotalCount,
+      enrollmentTotalPages,
+      enrollmentPerPage,
+      enrollmentCurrentPage,
+      enrollmentImageData: images.length ? images[0] : null,
       formMode: true,
       enrollmentFormMode: false,
       staffMember: null,
-      currentEnrollment: null,
-      enrollmentImageData: null
+      currentEnrollment: null
     });
+
   } catch (err) {
     console.error("Error loading staff add form:", err);
     res.status(500).send("Error loading staff add form");
   }
 });
+
+// ✅ Show Edit Staff form
+router.get("/administration/staff/edit/:id", async (req, res) => {
+  try {
+    let staffCurrentPage = parseInt(req.query.staffPage, 10) || 1;
+    if (isNaN(staffCurrentPage) || staffCurrentPage < 1) staffCurrentPage = 1;
+
+    const staffPerPage = 10;
+    const staffOffset = (staffCurrentPage - 1) * staffPerPage;
+
+    const [staffCountRows] = await db.execute("SELECT COUNT(*) AS count FROM staff");
+    const staffTotalCount = staffCountRows[0].count;
+    const staffTotalPages = Math.ceil(staffTotalCount / staffPerPage);
+
+    // Use numeric values directly
+    const [staff] = await db.execute(
+      `SELECT * FROM staff ORDER BY id ASC LIMIT ${staffPerPage} OFFSET ${staffOffset}`
+    );
+
+    const [staffMember] = await db.execute("SELECT * FROM staff WHERE id = ?", [req.params.id]);
+    if (staffMember.length === 0) return res.status(404).send("Staff not found");
+
+    // ===== Enrollment data for table =====
+    let enrollmentCurrentPage = parseInt(req.query.enrollmentPage, 10) || 1;
+    if (isNaN(enrollmentCurrentPage) || enrollmentCurrentPage < 1) enrollmentCurrentPage = 1;
+
+    const enrollmentPerPage = 10;
+    const enrollmentOffset = (enrollmentCurrentPage - 1) * enrollmentPerPage;
+
+    const [enrollmentCountRows] = await db.execute("SELECT COUNT(*) AS count FROM student_enrollment");
+    const enrollmentTotalCount = enrollmentCountRows[0].count;
+    const enrollmentTotalPages = Math.ceil(enrollmentTotalCount / enrollmentPerPage);
+
+    const [enrollments] = await db.execute(
+      `SELECT * FROM student_enrollment ORDER BY id ASC LIMIT ${enrollmentPerPage} OFFSET ${enrollmentOffset}`
+    );
+
+    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
+
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      staffTotalCount,
+      staffTotalPages,
+      staffPerPage,
+      staffCurrentPage,
+      enrollmentTotalCount,
+      enrollmentTotalPages,
+      enrollmentPerPage,
+      enrollmentCurrentPage,
+      enrollmentImageData: images.length ? images[0] : null,
+      formMode: true,
+      enrollmentFormMode: false,
+      staffMember: staffMember[0],
+      currentEnrollment: null
+    });
+
+  } catch (err) {
+    console.error("Error loading staff edit form:", err);
+    res.status(500).send("Error loading staff edit form");
+  }
+});
+router.get("/administration/staff/delete/:id", async (req, res) => {
+  try {
+    await db.execute("DELETE FROM staff WHERE id = ?", [req.params.id]);
+
+    const page = req.query.staffPage || 1;
+    res.redirect(`/admin/administration?staffPage=${page}`);
+  } catch (err) {
+    console.error("Error deleting staff:", err);
+    res.status(500).send("Error deleting staff");
+  }
+});
+// ✅ Show Add Enrollment Form
+// ✅ Show Add Enrollment Form
+router.get("/administration/enrollment/add", async (req, res) => {
+  try {
+    // Staff pagination
+    const staffCurrentPage = Math.max(Number(req.query.staffPage) || 1, 1);
+    const staffPerPage = 10;
+    const staffOffset = (staffCurrentPage - 1) * staffPerPage;
+
+    const [staffCountRows] = await db.execute("SELECT COUNT(*) AS count FROM staff");
+    const staffTotalCount = staffCountRows[0].count;
+    const staffTotalPages = Math.ceil(staffTotalCount / staffPerPage);
+
+    // Inject LIMIT and OFFSET directly
+    const [staff] = await db.execute(
+      `SELECT * FROM staff ORDER BY id ASC LIMIT ${staffPerPage} OFFSET ${staffOffset}`
+    );
+
+    // Enrollment pagination
+    const enrollmentCurrentPage = Math.max(Number(req.query.enrollmentPage) || 1, 1);
+    const enrollmentPerPage = 10;
+    const enrollmentOffset = (enrollmentCurrentPage - 1) * enrollmentPerPage;
+
+    const [enrollmentCountRows] = await db.execute("SELECT COUNT(*) AS count FROM student_enrollment");
+    const enrollmentTotalCount = enrollmentCountRows[0].count;
+    const enrollmentTotalPages = Math.ceil(enrollmentTotalCount / enrollmentPerPage);
+
+    // Inject LIMIT and OFFSET directly
+    const [enrollments] = await db.execute(
+      `SELECT * FROM student_enrollment ORDER BY id ASC LIMIT ${enrollmentPerPage} OFFSET ${enrollmentOffset}`
+    );
+
+    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
+
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      staffTotalCount,
+      staffTotalPages,
+      staffPerPage,
+      staffCurrentPage,
+      enrollmentTotalCount,
+      enrollmentTotalPages,
+      enrollmentPerPage,
+      enrollmentCurrentPage,
+      enrollmentImageData: images.length ? images[0] : null,
+      formMode: false,
+      enrollmentFormMode: true,
+      staffMember: null,
+      currentEnrollment: null
+    });
+  } catch (err) {
+    console.error("Error loading add enrollment form:", err);
+    res.status(500).send("Error loading add enrollment form");
+  }
+});
+
+// ✅ Show Edit Enrollment Form
+router.get("/administration/enrollment/edit/:id", async (req, res) => {
+  try {
+    const enrollmentId = req.params.id;
+    const [enrollmentRows] = await db.execute(
+      "SELECT * FROM student_enrollment WHERE id = ?",
+      [enrollmentId]
+    );
+
+    if (enrollmentRows.length === 0) return res.status(404).send("Enrollment not found");
+
+    // Staff pagination
+    const staffCurrentPage = Math.max(Number(req.query.staffPage) || 1, 1);
+    const staffPerPage = 10;
+    const staffOffset = (staffCurrentPage - 1) * staffPerPage;
+
+    const [staffCountRows] = await db.execute("SELECT COUNT(*) AS count FROM staff");
+    const staffTotalCount = staffCountRows[0].count;
+    const staffTotalPages = Math.ceil(staffTotalCount / staffPerPage);
+
+    // Inject LIMIT and OFFSET directly
+    const [staff] = await db.execute(
+      `SELECT * FROM staff ORDER BY id ASC LIMIT ${staffPerPage} OFFSET ${staffOffset}`
+    );
+
+    // Enrollment pagination
+    const enrollmentCurrentPage = Math.max(Number(req.query.enrollmentPage) || 1, 1);
+    const enrollmentPerPage = 10;
+    const enrollmentOffset = (enrollmentCurrentPage - 1) * enrollmentPerPage;
+
+    const [enrollmentCountRows] = await db.execute("SELECT COUNT(*) AS count FROM student_enrollment");
+    const enrollmentTotalCount = enrollmentCountRows[0].count;
+    const enrollmentTotalPages = Math.ceil(enrollmentTotalCount / enrollmentPerPage);
+
+    const [enrollments] = await db.execute(
+      `SELECT * FROM student_enrollment ORDER BY id ASC LIMIT ${enrollmentPerPage} OFFSET ${enrollmentOffset}`
+    );
+
+    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
+
+    res.render("admin/admin_administration", {
+      staffList: staff,
+      enrollmentList: enrollments,
+      staffTotalCount,
+      staffTotalPages,
+      staffPerPage,
+      staffCurrentPage,
+      enrollmentTotalCount,
+      enrollmentTotalPages,
+      enrollmentPerPage,
+      enrollmentCurrentPage,
+      enrollmentImageData: images.length ? images[0] : null,
+      formMode: false,
+      enrollmentFormMode: true,
+      staffMember: null,
+      currentEnrollment: enrollmentRows[0]
+    });
+  } catch (err) {
+    console.error("Error loading edit enrollment form:", err);
+    res.status(500).send("Error loading edit enrollment form");
+  }
+});
+
+// ✅ Delete Enrollment
+router.get("/administration/enrollment/delete/:id", async (req, res) => {
+  try {
+    const enrollmentId = req.params.id;
+    await db.execute("DELETE FROM student_enrollment WHERE id = ?", [enrollmentId]);
+
+    const page = req.query.enrollmentPage || 1;
+    res.redirect(`/admin/administration?enrollmentPage=${page}`);
+  } catch (err) {
+    console.error("Error deleting enrollment:", err);
+    res.status(500).send("Error deleting enrollment");
+  }
+});
+
 
 // ✅ Handle Add Staff
 router.post("/administration/staff/add", async (req, res) => {
@@ -1579,31 +1864,6 @@ router.post("/administration/staff/add", async (req, res) => {
   } catch (err) {
     console.error("Error adding staff:", err);
     res.status(500).send("Error adding staff");
-  }
-});
-
-// ✅ Show Edit Staff form
-router.get("/administration/staff/edit/:id", async (req, res) => {
-  try {
-    const [rows] = await db.execute("SELECT * FROM staff WHERE id = ?", [req.params.id]);
-
-    if (rows.length === 0) return res.status(404).send("Staff not found");
-
-    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
-    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
-
-    res.render("admin/admin_administration", {
-      staffList: staff,
-      enrollmentList: enrollments,
-      formMode: true,
-      enrollmentFormMode: false,
-      staffMember: rows[0],
-      currentEnrollment: null,
-      enrollmentImageData: null
-    });
-  } catch (err) {
-    console.error("Error loading staff edit form:", err);
-    res.status(500).send("Error loading staff edit form");
   }
 });
 
@@ -1646,41 +1906,6 @@ router.post("/administration/staff/edit/:id", async (req, res) => {
   }
 });
 
-// ✅ Delete Staff
-router.get("/administration/staff/delete/:id", async (req, res) => {
-  try {
-    await db.execute("DELETE FROM staff WHERE id = ?", [req.params.id]);
-    res.redirect("/admin/administration");
-  } catch (err) {
-    console.error("Error deleting staff:", err);
-    res.status(500).send("Error deleting staff");
-  }
-});
-
-// ========== ENROLLMENT ROUTES ==========
-
-// ✅ Show Add Enrollment Form
-router.get("/administration/enrollment/add", async (req, res) => {
-  try {
-    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
-    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
-    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
-
-    res.render("admin/admin_administration", {
-      staffList: staff,
-      enrollmentList: enrollments,
-      enrollmentImageData: images.length ? images[0] : null,
-      formMode: false,
-      enrollmentFormMode: true,
-      staffMember: null,
-      currentEnrollment: null
-    });
-  } catch (err) {
-    console.error("Error loading add enrollment form:", err);
-    res.status(500).send("Error loading add enrollment form");
-  }
-});
-
 // ✅ Handle Add Enrollment
 router.post("/administration/enrollment/add", async (req, res) => {
   try {
@@ -1703,32 +1928,6 @@ router.post("/administration/enrollment/add", async (req, res) => {
   }
 });
 
-// ✅ Show Edit Enrollment Form
-router.get("/administration/enrollment/edit/:id", async (req, res) => {
-  try {
-    const enrollmentId = req.params.id;
-    const [enrollmentRows] = await db.execute("SELECT * FROM student_enrollment WHERE id = ?", [enrollmentId]);
-
-    if (enrollmentRows.length === 0) return res.status(404).send("Enrollment not found");
-
-    const [staff] = await db.execute("SELECT * FROM staff ORDER BY id ASC");
-    const [enrollments] = await db.execute("SELECT * FROM student_enrollment ORDER BY id ASC");
-    const [images] = await db.execute("SELECT * FROM enrollment_images ORDER BY id DESC LIMIT 1");
-
-    res.render("admin/admin_administration", {
-      staffList: staff,
-      enrollmentList: enrollments,
-      enrollmentImageData: images.length ? images[0] : null,
-      formMode: false,
-      enrollmentFormMode: true,
-      staffMember: null,
-      currentEnrollment: enrollmentRows[0]
-    });
-  } catch (err) {
-    console.error("Error loading edit enrollment form:", err);
-    res.status(500).send("Error loading edit enrollment form");
-  }
-});
 
 // ✅ Handle Edit Enrollment
 router.post("/administration/enrollment/edit/:id", async (req, res) => {
@@ -1754,24 +1953,7 @@ router.post("/administration/enrollment/edit/:id", async (req, res) => {
 });
 
 // ✅ Delete Enrollment
-router.get("/administration/enrollment/delete/:id", async (req, res) => {
-  try {
-    const enrollmentId = req.params.id;
 
-    // Check if enrollment exists
-    const [enrollmentRows] = await db.execute("SELECT * FROM student_enrollment WHERE id = ?", [enrollmentId]);
-    if (enrollmentRows.length === 0) {
-      return res.redirect("/admin/administration?error=Enrollment not found");
-    }
-
-    await db.execute("DELETE FROM student_enrollment WHERE id = ?", [enrollmentId]);
-
-    res.redirect("/admin/administration");
-  } catch (err) {
-    console.error("Error deleting enrollment:", err);
-    res.redirect("/admin/administration?error=Error deleting enrollment");
-  }
-});
 
 router.post("/administration/enrollment/image", isAuthenticated, upload.single("image_file"), async (req, res) => {
   try {
