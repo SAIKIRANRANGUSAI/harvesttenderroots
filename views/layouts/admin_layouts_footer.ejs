@@ -2,7 +2,16 @@
 
             <!-- Footer -->
             <footer class="dashboard-footer">
-                <p>&copy; 2025 Harvest Tender Roots. All rights reserved.</p>
+               <%
+  const startYear = 2025;
+  const currentYear = new Date().getFullYear();
+  const displayYear = currentYear === startYear ? `${startYear}` : `${startYear}-${currentYear - 2000}`;
+%>
+<p>
+  Copyright <%= displayYear %> | Harvest Tender Roots | All Rights Reserved | Design and Developed by 
+  <a href="https://thecolourmoon.com" target="_blank">Colourmoon</a>
+</p>
+
             </footer>
         </div>
     </div>

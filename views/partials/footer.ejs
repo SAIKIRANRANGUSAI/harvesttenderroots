@@ -1,205 +1,169 @@
+<footer>
+  <!-- footer-area-start -->
+  <div class="it-footer-area it-footer-bg black-bg pt-120 pb-70" data-background="/images/footer/bg-1-1.jpg">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-30">
+          <div class="it-footer-widget footer-col-1">
+    <div class="it-footer-logo pb-25">
+        <a href="index">
+            <img src="<%= siteSettings.site_logo %>" alt="Logo" />
+        </a>
+    </div>
+    <div class="it-footer-text pb-5">
+        <p>
+            <%= siteSettings.site_description %>
+        </p>
+    </div>
+    <div class="it-footer-social">
+        <% if (siteSettings.facebook) { %>
+            <a href="<%= siteSettings.facebook %>"><i class="fa-brands fa-facebook-f"></i></a>
+        <% } %>
+        <% if (siteSettings.instagram) { %>
+            <a href="<%= siteSettings.instagram %>"><i class="fa-brands fa-instagram"></i></a>
+        <% } %>
+        <% if (siteSettings.pinterest) { %>
+            <a href="<%= siteSettings.pinterest %>"><i class="fa-brands fa-pinterest-p"></i></a>
+        <% } %>
+        <% if (siteSettings.twitter) { %>
+            <a href="<%= siteSettings.twitter %>"><i class="fa-brands fa-twitter"></i></a>
+        <% } %>
+    </div>
+</div>
 
-    <footer>
-      <!-- footer-area-start -->
-      <div
-        class="it-footer-area it-footer-bg black-bg pt-120 pb-70"
-        data-background="/images/footer/bg-1-1.jpg"
-      >
-        <div class="container">
-          <div class="row">
-            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-30">
-              <div class="it-footer-widget footer-col-1">
-                <div class="it-footer-logo pb-25">
-                  <a href="index"
-                    ><img src="/images/harvest-logo.png" alt=""
-                  /></a>
-                </div>
-                <div class="it-footer-text pb-5">
-                  <p>
-                    Harvest School – Nurturing Young Minds with <br />
-                    Joy, Values, and All-Round Growth.
-                  </p>
-                </div>
-                <div class="it-footer-social">
-                  <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                  <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                  <a href="#"><i class="fa-brands fa-pinterest-p"></i></a>
-                  <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                </div>
-              </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-30">
+          <div class="it-footer-widget">
+            <h4 class="it-footer-title">Information</h4>
+            <div class="it-footer-list">
+              <ul>
+                <li>
+                  <a href="about-us"><i class="fa-regular fa-angle-right"></i>About
+                    School</a>
+                </li>
+                <li>
+                  <a href="school-info"><i class="fa-regular fa-angle-right"></i>School-
+                    Info</a>
+                </li>
+                <li>
+                  <a href="principal-message"><i class="fa-regular fa-angle-right"></i>Principal-Messages</a>
+                </li>
+                <li>
+                  <a href="admission-procedure"><i class="fa-regular fa-angle-right"></i>Admission
+                    Procedure</a>
+                </li>
+                <li>
+                  <a href="fee-structure"><i class="fa-regular fa-angle-right"></i>Fee
+                    Structure</a>
+                </li>
+                <li>
+                  <a href="staff"><i class="fa-regular fa-angle-right"></i>Staff</a>
+                </li>
+                <li>
+                  <a href="student-enrollment"><i class="fa-regular fa-angle-right"></i>Student
+                    Enrollment</a>
+                </li>
+              </ul>
             </div>
-            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-30">
-              <div class="it-footer-widget">
-                <h4 class="it-footer-title">Information</h4>
-                <div class="it-footer-list">
-                  <ul>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-30">
+          <div class="it-footer-widget footer-col-3">
+            <h4 class="it-footer-title">Facilities</h4>
+            <div class="it-footer-list">
+              <ul>
+                <% if (menuFacilities && menuFacilities.length> 0) { %>
+                  <% menuFacilities.forEach(f=> { %>
                     <li>
-                      <a href="about-us"
-                        ><i class="fa-regular fa-angle-right"></i>About
-                        School</a
-                      >
-                    </li>
-                    <li>
-                      <a href="school-info"
-                        ><i class="fa-regular fa-angle-right"></i>School-
-                        Info</a
-                      >
-                    </li>
-                    <li>
-                      <a href="principal-message"
-                        ><i class="fa-regular fa-angle-right"></i
-                        >Principal-Messages</a
-                      >
-                    </li>
-                    <li>
-                      <a href="admission-procedure"
-                        ><i class="fa-regular fa-angle-right"></i>Admission
-                        Procedure</a
-                      >
-                    </li>
-                    <li>
-                      <a href="fee-structure"
-                        ><i class="fa-regular fa-angle-right"></i>Fee
-                        Structure</a
-                      >
-                    </li>
-                    <li>
-                      <a href="staff"
-                        ><i class="fa-regular fa-angle-right"></i>Staff</a
-                      >
-                    </li>
-                    <li>
-                      <a href="student-enrollment"
-                        ><i class="fa-regular fa-angle-right"></i>Student
-                        Enrollment</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-30">
-              <div class="it-footer-widget footer-col-3">
-                <h4 class="it-footer-title">Facilities</h4>
-                <div class="it-footer-list">
-                  <ul>
-                    <li>
-                      <a href="yoga"
-                        ><i class="fa-regular fa-angle-right"></i>Yoga
+                      <a href="/<%= f.facility_name.toLowerCase().replace(/ /g, '-') %>">
+                        <i class="fa-regular fa-angle-right"></i>
+                        <%= f.facility_name %>
                       </a>
                     </li>
-                    <li>
-                      <a href="dance"
-                        ><i class="fa-regular fa-angle-right"></i>Dance</a
-                      >
-                    </li>
-                    <li>
-                      <a href="#"
-                        ><i class="fa-regular fa-angle-right"></i>DRawing</a
-                      >
-                    </li>
-                    <li>
-                      <a href="#"
-                        ><i class="fa-regular fa-angle-right"></i>Arts &
-                        Crafts</a
-                      >
-                    </li>
-                    <li>
-                      <a href="#"
-                        ><i class="fa-regular fa-angle-right"></i>Labs</a
-                      >
-                    </li>
-                    <li>
-                      <a href="#"
-                        ><i class="fa-regular fa-angle-right"></i>Library</a
-                      >
-                    </li>
-                    <li>
-                      <a href="#"
-                        ><i class="fa-regular fa-angle-right"></i>Abacus</a
-                      >
-                    </li>
-                    <li>
-                      <a href="#"
-                        ><i class="fa-regular fa-angle-right"></i>Trinity</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
+                    <% }) %>
+                      <% } else { %>
+                        <li><a href="#"><i class="fa-regular fa-angle-right"></i> No Facilities</a></li>
+                        <% } %>
+              </ul>
             </div>
+
           </div>
         </div>
       </div>
-      <!-- footer-area-end -->
+    </div>
+  </div>
+  <!-- footer-area-end -->
 
-      <!-- copy-right area start -->
-      <div class="it-copyright-area it-copyright-height">
-        <div class="container">
-          <div class="row">
-            <div
-              class="col-12 wow itfadeUp"
-              data-wow-duration=".9s"
-              data-wow-delay=".3s"
-            >
-              <div class="it-copyright-text text-center">
-                <p>
-                 Copyright 2025 | Harvest Tender Roots | All Rights Reserved | Design and Developed by <a href="https://thecolourmoon.com/index.ejs" target="_blank">Colourmoon</a>
+  <!-- copy-right area start -->
+  <div class="it-copyright-area it-copyright-height">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 wow itfadeUp" data-wow-duration=".9s" data-wow-delay=".3s">
+          <div class="it-copyright-text text-center">
+            <%
+  const startYear = 2025;
+  const currentYear = new Date().getFullYear();
+  const displayYear = currentYear === startYear ? `${startYear}` : `${startYear}-${currentYear - 2000}`;
+%>
+<p>
+  Copyright <%= displayYear %> | Harvest Tender Roots | All Rights Reserved | Design and Developed by 
+  <a href="https://thecolourmoon.com" target="_blank">Colourmoon</a>
+</p>
 
-                </p>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
-      <!-- copy-right area end -->
-    </footer>
+    </div>
+  </div>
+  <!-- copy-right area end -->
+</footer>
 
-    <!-- JS here -->
-    <script src="/js/jquery.js"></script>
-    <script src="/js/waypoints.js"></script>
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/slick.min.js"></script>
-    <script src="/js/magnific-popup.js"></script>
-    <script src="/js/purecounter.js"></script>
-    <script src="/js/wow.js"></script>
-    <script src="/js/swiper-bundle.js"></script>
-    <script src="/js/isotope-pkgd.js"></script>
-    <script src="/js/imagesloaded-pkgd.js"></script>
-    <script src="/js/ajax-form.js"></script>
-    <script src="/js/main.js"></script>
+<!-- JS here -->
+<script src="/js/jquery.js"></script>
+<script src="/js/waypoints.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/slick.min.js"></script>
+<script src="/js/magnific-popup.js"></script>
+<script src="/js/purecounter.js"></script>
+<script src="/js/wow.js"></script>
+<script src="/js/swiper-bundle.js"></script>
+<script src="/js/isotope-pkgd.js"></script>
+<script src="/js/imagesloaded-pkgd.js"></script>
+<script src="/js/ajax-form.js"></script>
+<script src="/js/main.js"></script>
 
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-      <!-- LightGallery scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/lightgallery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/plugins/zoom/lg-zoom.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!-- LightGallery scripts -->
+<script src="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/lightgallery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/plugins/zoom/lg-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
 
-    <script>
-      var swiper = new Swiper(".mySwiper", {
-        slidesPerView: 2,
-        spaceBetween: 20,
-        autoplay: {
-          delay: 3000,
-          disableOnInteraction: false,
-        },
-        pagination: {
-          el: ".swiper-pagination",
-          clickable: true,
-        },
-        breakpoints: {
-          0: {
-            slidesPerView: 1, // Mobile
-          },
-          768: {
-            slidesPerView: 2, // Tablet/Desktop
-          },
-        },
-      });
-    </script>
+<script>
+  var swiper = new Swiper(".mySwiper", {
+    slidesPerView: 2,
+    spaceBetween: 20,
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+    breakpoints: {
+      0: {
+        slidesPerView: 1, // Mobile
+      },
+      768: {
+        slidesPerView: 2, // Tablet/Desktop
+      },
+    },
+  });
+</script>
 
-    <!--gallery script-->
+<!--gallery script-->
 <!-- 
     <script>
       import lightGallery from "https://cdn.skypack.dev/lightgallery@2.0.0-beta.4";
@@ -228,18 +192,19 @@
     </script> -->
 
 
-      <script>
-    // Initialize the lightbox
-    document.addEventListener('DOMContentLoaded', function () {
-      lightGallery(document.getElementById('lightgallery'), {
-        selector: 'a',
-        speed: 400,
-        plugins: [lgZoom, lgThumbnail],
-        download: true,
-        thumbnail: true,
-        zoom: true,
-      });
+<script>
+  // Initialize the lightbox
+  document.addEventListener('DOMContentLoaded', function () {
+    lightGallery(document.getElementById('lightgallery'), {
+      selector: 'a',
+      speed: 400,
+      plugins: [lgZoom, lgThumbnail],
+      download: true,
+      thumbnail: true,
+      zoom: true,
     });
-  </script>
-  </body>
+  });
+</script>
+</body>
+
 </html>

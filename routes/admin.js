@@ -4,6 +4,7 @@ const db = require("../config/db");
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary"); // your Cloudinary config
 const fs = require("fs");
+const bcrypt = require('bcryptjs'); // For password hashing
 
 const Controller = require("../controllers/Controller");
 const { isAuthenticated } = Controller;
@@ -1996,4 +1997,252 @@ router.post("/administration/enrollment/image", isAuthenticated, upload.single("
     res.redirect("/admin/administration?error=Error updating enrollment image");
   }
 });
+// GET Settings page
+router.get('/settings', async (req, res) => {
+  try {
+    // Fetch site settings
+    const [rows] = await db.execute('SELECT * FROM site_settings WHERE id = 1');
+    const settings = rows[0] || {};
+
+    // Fetch SEO settings
+    // const [seoSettings] = await db.execute('SELECT * FROM seo_settings ORDER BY id DESC');
+
+    // Ensure fields exist
+    settings.address = settings.address || '';
+    settings.email = settings.email || '';
+    settings.phone = settings.phone || '';
+
+    res.render('admin/admin_settings', { settings, credMessage: null });
+  } catch (err) {
+    console.error(err);
+    res.send('Error fetching settings');
+  }
+});
+
+router.post('/settings', upload.fields([
+  { name: 'site_logo', maxCount: 1 },
+  { name: 'favicon', maxCount: 1 }
+]), async (req, res) => {
+  try {
+    let { site_title, site_description, facebook, instagram, pinterest, twitter, address, email, phone } = req.body;
+
+    // Handle Cloudinary uploads
+    const uploads = {};
+    if (req.files['site_logo'] && req.files['site_logo'][0]) {
+      const result = await cloudinary.uploader.upload(req.files['site_logo'][0].path);
+      uploads.site_logo = result.secure_url;
+    }
+    if (req.files['favicon'] && req.files['favicon'][0]) {
+      const result = await cloudinary.uploader.upload(req.files['favicon'][0].path);
+      uploads.favicon = result.secure_url;
+    }
+
+    // Update database
+    await db.execute(
+      `UPDATE site_settings SET
+        site_logo = COALESCE(?, site_logo),
+        favicon = COALESCE(?, favicon),
+        site_title = ?,
+        site_description = ?,
+        facebook = ?,
+        instagram = ?,
+        pinterest = ?,
+        twitter = ?,
+        address = ?,
+        email = ?,
+        phone = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = 1`,
+      [
+        uploads.site_logo || null,
+        uploads.favicon || null,
+        site_title,
+        site_description,
+        facebook,
+        instagram,
+        pinterest,
+        twitter,
+        address,
+        email,
+        phone
+      ]
+    );
+
+    res.redirect('/admin/settings');
+  } catch (err) {
+    console.error('POST /settings error:', err);
+    res.status(500).send('Error updating settings');
+  }
+});
+
+// 🔹 Show all SEO settings
+// router.get('/seo-settings', async (req, res) => {
+//   try {
+//     const [rows] = await db.execute('SELECT * FROM seo_settings');
+//     res.render('admin/admin_settings', { seoSettings: rows });
+//   } catch (err) {
+//     console.error(err);
+//     res.send('Error fetching SEO settings');
+//   }
+// });
+
+// 🔹 Add new SEO setting (GET form)
+// 🔹 Fetch all SEO settings (View)
+router.get('/seo-settings', async (req, res) => {
+  try {
+    const [seoSettings] = await db.execute('SELECT * FROM seo_settings ORDER BY id DESC');
+    res.render('admin/admin_seo', { seoSettings, seo: null });
+  } catch (err) {
+    console.error(err);
+    res.send('Error fetching SEO settings');
+  }
+});
+
+// 🔹 Add new SEO setting (POST)
+router.post('/seo-settings/add', async (req, res) => {
+  try {
+    const {
+      page_slug,
+      meta_title,
+      meta_description,
+      meta_keywords,
+      og_title,
+      og_description,
+      og_image,
+      twitter_title,
+      twitter_description,
+      twitter_image,
+      canonical_url
+    } = req.body;
+
+    await db.execute(
+      `INSERT INTO seo_settings 
+      (page_slug, meta_title, meta_description, meta_keywords, og_title, og_description, og_image, twitter_title, twitter_description, twitter_image, canonical_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [page_slug, meta_title, meta_description, meta_keywords, og_title, og_description, og_image, twitter_title, twitter_description, twitter_image, canonical_url]
+    );
+
+    res.redirect('/admin/seo-settings');
+  } catch (err) {
+    console.error(err);
+    res.send('Error adding SEO setting');
+  }
+});
+
+// 🔹 Edit SEO setting (GET form)
+// router.get('/seo-settings/edit/:id', async (req, res) => {
+//   try {
+//     const seoId = req.params.id;
+
+//     const [seoRows] = await db.execute('SELECT * FROM seo_settings WHERE id = ?', [seoId]);
+//     if (seoRows.length === 0) return res.redirect('/admin/seo-settings');
+
+//     const seo = seoRows[0];
+//     const [seoSettings] = await db.execute('SELECT * FROM seo_settings ORDER BY id DESC');
+
+//     res.render('admin/admin_seo', { seoSettings, seo });
+//   } catch (err) {
+//     console.error(err);
+//     res.send('Error fetching SEO setting for edit');
+//   }
+// });
+
+// 🔹 Update SEO setting (POST)
+router.post('/seo-settings/edit/:id', async (req, res) => {
+  try {
+    const {
+      page_slug,
+      meta_title,
+      meta_description,
+      meta_keywords,
+      og_title,
+      og_description,
+      og_image,
+      twitter_title,
+      twitter_description,
+      twitter_image,
+      canonical_url
+    } = req.body;
+
+    await db.execute(
+      `UPDATE seo_settings 
+       SET page_slug=?, meta_title=?, meta_description=?, meta_keywords=?, og_title=?, og_description=?, og_image=?, twitter_title=?, twitter_description=?, twitter_image=?, canonical_url=? 
+       WHERE id=?`,
+      [page_slug, meta_title, meta_description, meta_keywords, og_title, og_description, og_image, twitter_title, twitter_description, twitter_image, canonical_url, req.params.id]
+    );
+
+    res.redirect('/admin/seo-settings');
+  } catch (err) {
+    console.error(err);
+    res.send('Error updating SEO setting');
+  }
+});
+
+// 🔹 Delete SEO setting
+router.get('/seo-settings/delete/:id', async (req, res) => {
+  try {
+    await db.execute('DELETE FROM seo_settings WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/seo-settings');
+  } catch (err) {
+    console.error(err);
+    res.send('Error deleting SEO setting');
+  }
+});
+
+router.post('/change-credentials', async (req, res) => {
+  try {
+    const { current_username, current_password, new_username, new_password, confirm_password } = req.body;
+
+    if (new_password !== confirm_password) {
+      return res.render('admin/settings', {
+        settings: {}, 
+        seoSettings: [], 
+        credMessage: { type: 'danger', text: 'New passwords do not match.' }
+      });
+    }
+
+    // Fetch admin from DB
+    const [rows] = await db.execute('SELECT * FROM admins WHERE username = ?', [current_username]);
+    if (!rows.length) {
+      return res.render('admin/settings', {
+        settings: {}, 
+        seoSettings: [], 
+        credMessage: { type: 'danger', text: 'Current username not found.' }
+      });
+    }
+
+    const admin = rows[0];
+
+    // Compare current password
+    const passwordMatch = await bcrypt.compare(current_password, admin.password);
+    if (!passwordMatch) {
+      return res.render('admin/settings', {
+        settings: {}, 
+        seoSettings: [], 
+        credMessage: { type: 'danger', text: 'Current password is incorrect.' }
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+
+    // Update username & password
+    await db.execute('UPDATE admins SET username = ?, password = ? WHERE id = ?', [new_username, hashedPassword, admin.id]);
+
+    res.render('admin/admin_settings', {
+      settings: {}, 
+      seoSettings: [], 
+      credMessage: { type: 'success', text: 'Admin credentials updated successfully.' }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.render('admin/admin_settings', {
+      settings: {}, 
+      seoSettings: [], 
+      credMessage: { type: 'danger', text: 'Error updating credentials.' }
+    });
+  }
+});
+
 module.exports = router;
