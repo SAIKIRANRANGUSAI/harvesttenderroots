@@ -37,7 +37,7 @@ router.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.redirect("/admin/login");
 });
-
+router.use(adminController.isAuthenticated);
 router.get("/dashboard", async (req, res) => {
   try {
     const contactPerPage = 10;
@@ -2246,3 +2246,4 @@ router.post('/change-credentials', async (req, res) => {
 });
 
 module.exports = router;
+
