@@ -32,47 +32,42 @@
             <div class="table-wrap">
 
                 <table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse;"
-                    class="table table-striped">
-                    <thead>
-
-                        <tr style="background-color:#dc3545; color:#fff; text-align:center;">
-                            <th>SL NO.</th>
-                            <th>Teacher Name</th>
-                            <th>Designation</th>
-                            <th>Date of Birth</th>
-                            <th>Prof. Qual</th>
-                            <th>Experience</th>
-                            <th>Trained/Untrained</th>
-                            <th>First Appointment</th>
-                            <th>Class Assigned</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (staffList && staffList.length > 0) { %>
-  <% staffList.forEach((staff, index) => { %>
-    <tr style="background-color: <%= index % 2 === 0 ? '#fff' : '#f8f9fa' %>; text-align:center;">
-      <!-- SL NO adjusted for pagination -->
-      <td><%= (currentPage - 1) * 10 + index + 1 %></td>
-      <td><%= staff.teacher_name %></td>
-      <td><%= staff.designation %></td>
-      <td><%= staff.date_of_birth ? staff.date_of_birth.toISOString().split('T')[0] : '-' %></td>
-      <td><%= staff.professional_qualification || '-' %></td>
-      <td><%= staff.experience || '-' %></td>
-      <td><%= staff.trained_status %></td>
-      <td><%= staff.first_appointment ? staff.first_appointment.toISOString().split('T')[0] : '-' %></td>
-      <td><%= staff.class_assigned || '-' %></td>
-    </tr>
-  <% }) %>
-<% } else { %>
-  <tr>
-    <td colspan="9" class="text-center">No staff members found</td>
-  </tr>
-<% } %>
-
-
-                    </tbody>
-
-                </table>
+    class="table table-striped">
+    <thead>
+        <tr style="background-color:#dc3545; color:#fff;">
+            <th style="text-align:center;">SL NO.</th>
+            <th style="text-align:left;">Teacher Name</th>
+            <th style="text-align:left;">Designation</th>
+            <th style="text-align:center;">Date of Birth</th>
+            <th style="text-align:left;">Prof. Qual</th>
+            <th style="text-align:center;">Experience</th>
+            <th style="text-align:center;">Trained/Untrained</th>
+            <th style="text-align:center;">First Appointment</th>
+            <th style="text-align:left;">Class Assigned</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (staffList && staffList.length > 0) { %>
+            <% staffList.forEach((staff, index) => { %>
+                <tr style="background-color: <%= index % 2 === 0 ? '#fff' : '#f8f9fa' %>;">
+                    <td style="text-align:center;"><%= (currentPage - 1) * 10 + index + 1 %></td>
+                    <td style="text-align:left;"><%= staff.teacher_name %></td>
+                    <td style="text-align:left;"><%= staff.designation %></td>
+                    <td style="text-align:center;"><%= staff.date_of_birth ? staff.date_of_birth.toISOString().split('T')[0] : '-' %></td>
+                    <td style="text-align:left;"><%= staff.professional_qualification || '-' %></td>
+                    <td style="text-align:center;"><%= staff.experience || '-' %></td>
+                    <td style="text-align:center;"><%= staff.trained_status %></td>
+                    <td style="text-align:center;"><%= staff.first_appointment ? staff.first_appointment.toISOString().split('T')[0] : '-' %></td>
+                    <td style="text-align:left;"><%= staff.class_assigned || '-' %></td>
+                </tr>
+            <% }) %>
+        <% } else { %>
+            <tr>
+                <td colspan="9" class="text-center">No staff members found</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
 
             </div>
 
@@ -117,5 +112,6 @@
 
         </div>
     </div>
+
 
     <%- include('partials/footer') %>
