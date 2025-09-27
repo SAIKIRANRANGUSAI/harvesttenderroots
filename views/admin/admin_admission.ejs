@@ -10,6 +10,66 @@
                 border-color: var(--ck-color-base-border);
                 padding: 10px 30px;
             }
+            /* Modal full overlay */
+/* overlay only */
+#admissionModal {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: none; /* JS toggles this */
+  background: rgba(0,0,0,0.5);
+  z-index: 1050;
+  overflow: visible;
+}
+
+/* fix input borders inside modal */
+#admissionModal .form-control,
+#admissionModal input,
+#admissionModal select,
+#admissionModal textarea {
+  border: 1px solid #ced4da !important; /* full border */
+  border-radius: 4px;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#admissionModal .form-control:focus,
+#admissionModal input:focus,
+#admissionModal select:focus,
+#admissionModal textarea:focus {
+  border-color: #80bdff !important;   /* nice focus */
+  box-shadow: 0 0 0 2px rgba(0,123,255,.25) !important;
+}
+
+/* force center */
+#admissionModal .modal-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 700px;
+  width: 100%;
+  margin: 0;
+}
+
+/* modal box */
+#admissionModal .modal-content {
+  background: #fff; /* container bg only */
+  animation: fadeIn 0.25s ease-in-out;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 10px; /* optional spacing */
+}
+
+/* small animation */
+@keyframes fadeIn {
+  from { transform: scale(0.98); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+
         </style>
 
 
@@ -48,7 +108,7 @@
                                 <% } %>
 
                                     <input type="file" name="image" class="form-input" accept="image/*">
-                                    <small class="text-muted">Upload a new image to replace the current one</small>
+                                    <small class="text-muted">Upload a new image to replace the current one (Recommended size:	649 × 800 px and pls upload only images)</small>
                         </div>
 
                         <!-- Submit Button -->

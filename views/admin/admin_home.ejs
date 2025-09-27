@@ -62,7 +62,7 @@
 
                         <!-- Total Students -->
                         <div class="form-group">
-                            <label class="form-label">Total Students</label>
+                            <label class="form-label">Total Students (we are using k so this number will displyes by k)</label>
                             <input type="number" class="form-input" name="total_students"
                                 value="<%= typeof homeContent !== 'undefined' && homeContent.total_students ? homeContent.total_students : '0' %>"
                                 placeholder="Enter total students count" min="0">
@@ -89,7 +89,7 @@
                                                 <% } %>
                                     </div>
                                     <input type="file" class="form-input" name="<%= img.name %>" accept="image/*">
-                                    <small class="text-muted">Recommended size: <%= img.size %></small>
+                                    <small class="text-muted">Recommended size: <%= img.size %>, Please add only image</small>
                                 </div>
                                 <% }); %>
 
@@ -148,6 +148,7 @@
                 margin-top: 16px;
                 text-align: right;
             }
+            
         </style>
 
         <!-- core values section -->
@@ -165,9 +166,10 @@
             <div class="content-section">
                 <div class="section-header">
                     <h2 class="section-title">Manage Core Values</h2>
-                    <a href="javascript:void(0)" class="btn btn-primary" onclick="openCreateModal()">
-                        <i class="fas fa-plus"></i> Add New Value
-                    </a>
+                    <button type="button" class="btn btn-primary" onclick="openCreateModal()">
+    <i class="fas fa-plus"></i> Add New Value
+</button>
+
 
                 </div>
 

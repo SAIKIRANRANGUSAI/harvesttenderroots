@@ -4,14 +4,14 @@
     <!-- hero-area-start -->
     <div class="it-hero-2-area it-hero-2-bg fix p-relative" data-background="/images/hero-bg-1.jpg">
       <div class="it-hero-2-shape-4">
-        <img src="<%= homeContent.background_image || " Default Heading" %>" alt="" />
+        <img src="<%= homeContent.background_image || " Default Heading" %>" alt="background image" />
       </div>
 
       <div class="it-hero-2-funfact text-center d-none d-xl-block">
         <span class="theme"><i class="purecounter" data-purecounter-duration="1"
-            data-purecounter-end="11">0</i>k+</span>
+            data-purecounter-end="<%- homeContent.total_students %>">0</i>k+</span>
         <span>Total Student</span>
-        <img src="<%= homeContent.funfact_image || " Default Heading" %>" alt="" />
+        <img src="<%= homeContent.funfact_image || " Default Heading" %>" alt=" home page iage" />
       </div>
       <div class="container">
         <div class="row align-items-center">
@@ -46,7 +46,7 @@
           <div class="col-xl-4 col-lg-4">
             <div class="it-hero-2-thumb-box p-relative">
               <div class="it-hero-2-thumb p-relative">
-                <img src="<%= homeContent.hero_image || " Default Heading" %>" class="img-fluid" alt="" />
+                <img src="<%= homeContent.hero_image || " Default Heading" %>" class="img-fluid" alt=" hero image" />
                 <!-- <div class="it-hero-2-shape-1 d-none d-xl-block">
                     <img src="/images/hero/shape-2-6.png" alt="" />
                   </div> -->
@@ -248,7 +248,7 @@
                   <div class="it-funfact-item d-flex align-items-center">
                     <div class="it-funfact-icon">
                       <span>
-                        <img src="<%= f.image %>" alt="" />
+                        <img src="<%= f.image %>" alt="total images" />
                       </span>
                     </div>
                     <div class="it-funfact-content">
@@ -259,6 +259,7 @@
                       </h6>
                       <span>
                         <%= f.heading %>
+                        
                       </span>
                     </div>
                   </div>

@@ -10,74 +10,63 @@
 
 
     <div class="sidebar-menu" id="sidebarMenu">
-        <div class="menu-label">Main</div>
-        <a href="/admin/dashboard"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'dashboard') ? 'active' : '' %>">
-            <i class="fas fa-home"></i>
-            <span>Dashboard</span>
-        </a>
+    <!-- Main Section -->
+    <div class="menu-label">Main</div>
+    <a href="/admin/dashboard" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'dashboard') ? 'active' : '' %>">
+        <i class="fas fa-tachometer-alt me-2"></i>
+        <span>Dashboard</span>
+    </a>
+    <a href="/admin/home" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'home') ? 'active' : '' %>">
+        <i class="fas fa-home me-2"></i>
+        <span>Home</span>
+    </a>
 
-        <a href="/admin/home"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'home') ? 'active' : '' %>">
-            <i class="fas fa-house-user"></i>
-            <span>Home</span>
-        </a>
+    <!-- Content Section -->
+    <div class="menu-label">Content</div>
+    <a href="/admin/about-us" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'about-us') ? 'active' : '' %>">
+        <i class="fas fa-info-circle me-2"></i>
+        <span>About Us</span>
+    </a>
+    <a href="/admin/principal-message" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'principal-message') ? 'active' : '' %>">
+        <i class="fas fa-envelope-open-text me-2"></i>
+        <span>Principal Message</span>
+    </a>
+    <a href="/admin/admission" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'admission') ? 'active' : '' %>">
+        <i class="fas fa-file-alt me-2"></i>
+        <span>Admission</span>
+    </a>
+    <a href="/admin/events" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'events') ? 'active' : '' %>">
+        <i class="fas fa-calendar-alt me-2"></i>
+        <span>Events</span>
+    </a>
+    <a href="/admin/facilities" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'facilities') ? 'active' : '' %>">
+        <i class="fas fa-building me-2"></i>
+        <span>Facilities</span>
+    </a>
+    <a href="/admin/gallery" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'gallery') ? 'active' : '' %>">
+        <i class="fas fa-image me-2"></i>
+        <span>Gallery</span>
+    </a>
+    <a href="/admin/administration" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'administration') ? 'active' : '' %>">
+        <i class="fas fa-users-cog me-2"></i>
+        <span>Administration</span>
+    </a>
 
-        <div class="menu-label">Content</div>
-        <a href="/admin/about-us"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'about-us') ? 'active' : '' %>">
-            <i class="fas fa-info-circle"></i>
-            <span>About Us</span>
-        </a>
-        <a href="/admin/principal-message"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'principal-message') ? 'active' : '' %>">
-            <i class="fas fa-info-circle"></i>
-            <span>principal-message</span>
-        </a>
-        <a href="/admin/admission"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'admission') ? 'active' : '' %>">
-            <i class="fas fa-file-alt"></i>
-            <span>Admission</span>
-        </a>
-        <a href="/admin/Events"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'Events') ? 'active' : '' %>">
-            <i class="fas fa-graduation-cap"></i>
-            <span>Events</span>
-        </a>
-
-        <a href="/admin/Facilities"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'Facilities') ? 'active' : '' %>">
-            <i class="fas fa-graduation-cap"></i>
-            <span> Facilities</span>
-        </a>
-
-        <a href="/admin/gallery"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'gallery') ? 'active' : '' %>">
-            <i class="fas fa-graduation-cap"></i>
-            <span>Gallery</span>
-        </a>
-        <a href="/admin/Administration"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'Administration') ? 'active' : '' %>">
-            <i class="fas fa-users"></i>
-            <span>Administration</span>
-        </a>
-
-        <div class="menu-label">Settings</div>
-        <a href="/admin/settings"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'settings') ? 'active' : '' %>">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
-        </a>
-        <a href="/admin/seo-settings"
-            class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'seo-settings') ? 'active' : '' %>">
-            <i class="fas fa-cog"></i>
-            <span>SEO-Settings</span>
-        </a>
-        <a href="/admin/logout" class="menu-item" onclick="return confirm('Are you sure you want to logout?');">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </a>
-    </div>
+    <!-- Settings Section -->
+    <div class="menu-label">Settings</div>
+    <a href="/admin/settings" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'settings') ? 'active' : '' %>">
+        <i class="fas fa-cog me-2"></i>
+        <span>Settings</span>
+    </a>
+    <a href="/admin/seo-settings" class="menu-item <%= (typeof currentPage !== 'undefined' && currentPage === 'seo-settings') ? 'active' : '' %>">
+        <i class="fas fa-search me-2"></i>
+        <span>SEO Settings</span>
+    </a>
+    <a href="/admin/logout" class="menu-item" onclick="return confirm('Are you sure you want to logout?');">
+        <i class="fas fa-sign-out-alt me-2"></i>
+        <span>Logout</span>
+    </a>
+</div>
 
     <!-- <div class="sidebar-footer">
         <div class="user-info">
@@ -114,32 +103,35 @@
         left: 0;
         top: 0;
     }
+
     @media (max-width: 992px) {
-    .sidebar {
-        position: fixed;
-        left: -260px;
-        transition: left 0.3s ease;
-        z-index: 1000;
-    }
+        .sidebar {
+            position: fixed;
+            left: -260px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
 
-    .sidebar.collapsed {
-        left: 0;
-    }
+        .sidebar.collapsed {
+            left: 0;
+        }
 
-    .main-content-wrapper {
-        margin-left: 0;
+        .main-content-wrapper {
+            margin-left: 0;
+        }
     }
-}
 
 
     .sidebar-header {
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Logo and toggle button on sides */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-}
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        /* Logo and toggle button on sides */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.1);
+    }
+
     .sidebar-header img {
         width: 40px;
         height: 40px;
@@ -193,25 +185,28 @@
         height: 100%;
         width: 4px;
         background: var(--secondary);
-    }.sidebar-toggle {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-}
+    }
 
-.sidebar.collapsed {
-    width: 60px; /* collapsed width */
-}
+    .sidebar-toggle {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+    }
 
-.sidebar.collapsed .sidebar-menu {
-    display: none;
-}
+    .sidebar.collapsed {
+        width: 60px;
+        /* collapsed width */
+    }
 
-.sidebar.collapsed h2 {
-    display: none;
-}
+    .sidebar.collapsed .sidebar-menu {
+        display: none;
+    }
+
+    .sidebar.collapsed h2 {
+        display: none;
+    }
 
     .menu-item i {
         width: 24px;
